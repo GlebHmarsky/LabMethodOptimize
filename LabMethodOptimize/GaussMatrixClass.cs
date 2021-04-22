@@ -14,9 +14,10 @@ namespace LabMethodOptimize
         public Fraction[][] Matrix { get; set; }
         public Fraction[] RightPart { get; set; }
         public Fraction[] Answer { get; set; }
-
+        public List<int> IndexListBasisElements { get; set; }
         public GaussMatrix(uint Row, uint Colum)
         {
+            IndexListBasisElements = new List<int>();
             RightPart = new Fraction[Row];
             Answer = new Fraction[Row];
             Matrix = new Fraction[Row][];
@@ -28,18 +29,19 @@ namespace LabMethodOptimize
 
         public int SolveMatrix()
         {
-            if (RowCount != ColumCount)
-                return 1; //нет решения
-
+            Fraction MultipleCoeff;
+            if (IndexListBasisElements.Count != RowCount /*|| IndexListBasisElements.Count == 0*/)
+                return 1; //Ошибка: неправильное количество базисных элементов 
             for (int i = 0; i < RowCount - 1; i++)// После этого цикла имеем матрицу у которой снизу диагонали нули
             {
-                SortRows(i);
+                SortRows(i); // позволяет вынести ненулевой элемент столбца вверх 
                 for (int j = i + 1; j < RowCount; j++)
-                {
-                    if (Matrix[i][i] != 0) //если главный элемент не 0, то производим вычисления
+                {   
+                    // TODO ИСПРАВИТЬ МЕТОДА ГАУССА ПОД СПИСОК ОБНУЛЯЕМЫХ СТОЛБЦОВ!!!!!!!
+                    if (Matrix[i][IndexListBasisElements[i]] != 0) //если главный элемент не 0, то производим вычисления
                     {
-                        Fraction MultipleCoeff = Matrix[j][i] / Matrix[i][i];
-                        for (int k = i; k < ColumCount; k++)
+                        MultipleCoeff = Matrix[j][IndexListBasisElements[i]] / Matrix[i][IndexListBasisElements[i]];
+                        for (int k = 0; k < ColumCount; k++)
                         {
                             Matrix[j][k] -= Matrix[i][k] * MultipleCoeff;
                         }
@@ -48,52 +50,67 @@ namespace LabMethodOptimize
                     //для нулевого главного элемента просто пропускаем данный шаг
                 }
             }
+            //TODO: Эти условия необходимо так же исрпавить. Но пока они будут в качестве коммента
 
-            if (Matrix[RowCount - 1][ColumCount - 1] == 0 && RightPart[RowCount - 1] != 0)
-            {
-                //Нет решений
-                Console.WriteLine("Нет решений!");
-                return 1;
-            }
-            if (Matrix[RowCount - 1][ColumCount - 1] == 0 && RightPart[RowCount - 1] == 0)
-            {
-                //бм решений
-                Console.WriteLine("Бесконечно много решений!");
-                return 1;
-            }
+            //if (Matrix[RowCount - 1][ColumCount - 1] == 0 && RightPart[RowCount - 1] != 0)
+            //{
+            //    //Нет решений
+            //    Console.WriteLine("Нет решений!");
+            //    return 1;
+            //}
+            //if (Matrix[RowCount - 1][ColumCount - 1] == 0 && RightPart[RowCount - 1] == 0)
+            //{
+            //    //бм решений
+            //    Console.WriteLine("Бесконечно много решений!");
+            //    return 1;
+            //}
 
-            for (int i = 0; i < RowCount; i++)// Делаем на главной диагонали единицы
+            for (int i = 0; i < RowCount; i++)// Делаем на базисных элементах единицы
             {
-                Fraction ReversedElement = 1 / Matrix[i][i];
-                for (int j = i; j < ColumCount; j++)
+                Fraction ReversedElement = 1 / Matrix[i][IndexListBasisElements[i]];
+                for (int j = 0; j < ColumCount; j++)
                 {
                     Matrix[i][j] *= ReversedElement;
                 }
                 RightPart[i] *= ReversedElement;
             }
 
-            for (int h = 0; h <= (int)(RowCount - 2); h++)// После этого цикла имеем единичную матрицу
+            
+            for (int i = (int)RowCount-1; i > 0; i--)
             {
-                for (int i = (int)(RowCount - 2) - h; i >= 0; i--)
+                for (int g = 0; g < i; g++)
                 {
-                    Fraction MultipleCoeff = Matrix[i][(int)(ColumCount - 1) - h];
-                    Matrix[i][(int)(ColumCount - 1) - h] -= MultipleCoeff;
-                    RightPart[i] -= MultipleCoeff * RightPart[RowCount - 1 - h];
+                    MultipleCoeff = Matrix[g][IndexListBasisElements[i]];
+                    for (int col = 0; col < ColumCount; col++)
+                    {
+                        Matrix[g][col] -= MultipleCoeff * Matrix[i][col];
+                    }
+                    RightPart[g] -= MultipleCoeff * RightPart[i];
                 }
             }
+            
+            //for (int h = 0; h <= (int)(RowCount - 2); h++)// После этого цикла имеем единичную матрицу
+            //{
+            //    for (int i = (int)(RowCount - 2) - h; i >= 0; i--)
+            //    {
+            //        MultipleCoeff = Matrix[i][(int)(ColumCount - 1) - h];
+            //        Matrix[i][(int)(ColumCount - 1) - h] -= MultipleCoeff;
+            //        RightPart[i] -= MultipleCoeff * RightPart[RowCount - 1 - h];
+            //    }
+            //}
 
             return 0;
         }
 
         private void SortRows(int SortIndex)// Метод, который поднимает строку с наибольшим числом выше.
         {
-            Fraction MaxElement = Matrix[SortIndex][SortIndex];
+            Fraction MaxElement = Matrix[SortIndex][IndexListBasisElements[SortIndex]];
             int MaxElementIndex = SortIndex;
             for (int i = SortIndex + 1; i < RowCount; i++)
             {
-                if (Fraction.Abs(Matrix[i][SortIndex]) > MaxElement)
+                if (Fraction.Abs(Matrix[i][IndexListBasisElements[SortIndex]]) > MaxElement)
                 {
-                    MaxElement = Fraction.Abs(Matrix[i][SortIndex]);
+                    MaxElement = Fraction.Abs(Matrix[i][IndexListBasisElements[SortIndex]]);
                     MaxElementIndex = i;
                 }
             }

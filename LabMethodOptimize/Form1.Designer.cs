@@ -56,7 +56,7 @@ namespace LabMethodOptimize
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.objectiveFunctionTable = new System.Windows.Forms.DataGridView();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.SolutionGridView = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -74,8 +74,8 @@ namespace LabMethodOptimize
             this.Column14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column15 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column16 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
             this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.restrictionTable)).BeginInit();
@@ -87,7 +87,7 @@ namespace LabMethodOptimize
             this.groupBoxMethod.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.basicVariablesTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.objectiveFunctionTable)).BeginInit();
-            this.tabPage3.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SolutionGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -193,9 +193,9 @@ namespace LabMethodOptimize
             // tabControl
             // 
             this.tabControl.Controls.Add(this.tabPage1);
+            this.tabControl.Controls.Add(this.tabPage2);
             this.tabControl.Controls.Add(this.tabPage3);
             this.tabControl.Controls.Add(this.tabPage4);
-            this.tabControl.Controls.Add(this.tabPage2);
             this.tabControl.Location = new System.Drawing.Point(0, 27);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
@@ -340,6 +340,10 @@ namespace LabMethodOptimize
             // 
             // basicVariablesTable
             // 
+            this.basicVariablesTable.AllowUserToAddRows = false;
+            this.basicVariablesTable.AllowUserToDeleteRows = false;
+            this.basicVariablesTable.AllowUserToResizeColumns = false;
+            this.basicVariablesTable.AllowUserToResizeRows = false;
             this.basicVariablesTable.BackgroundColor = System.Drawing.SystemColors.Control;
             this.basicVariablesTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.basicVariablesTable.Location = new System.Drawing.Point(913, 44);
@@ -376,16 +380,16 @@ namespace LabMethodOptimize
             this.objectiveFunctionTable.Size = new System.Drawing.Size(550, 83);
             this.objectiveFunctionTable.TabIndex = 10;
             // 
-            // tabPage3
+            // tabPage2
             // 
-            this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage3.Controls.Add(this.SolutionGridView);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1717, 576);
-            this.tabPage3.TabIndex = 4;
-            this.tabPage3.Text = "Симплекс метод";
+            this.tabPage2.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage2.Controls.Add(this.SolutionGridView);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1717, 576);
+            this.tabPage2.TabIndex = 4;
+            this.tabPage2.Text = "Симплекс метод";
             // 
             // SolutionGridView
             // 
@@ -512,6 +516,16 @@ namespace LabMethodOptimize
             this.Column16.Name = "Column16";
             this.Column16.ReadOnly = true;
             // 
+            // tabPage3
+            // 
+            this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(1717, 576);
+            this.tabPage3.TabIndex = 5;
+            this.tabPage3.Text = "Метод искуственного базиса";
+            // 
             // tabPage4
             // 
             this.tabPage4.BackColor = System.Drawing.SystemColors.Control;
@@ -519,18 +533,8 @@ namespace LabMethodOptimize
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage4.Size = new System.Drawing.Size(1717, 576);
-            this.tabPage4.TabIndex = 5;
-            this.tabPage4.Text = "Метод искуственного базиса";
-            // 
-            // tabPage2
-            // 
-            this.tabPage2.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1717, 576);
-            this.tabPage2.TabIndex = 3;
-            this.tabPage2.Text = "Графический метод";
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Графический метод";
             // 
             // openFileDialog
             // 
@@ -559,7 +563,7 @@ namespace LabMethodOptimize
             this.groupBoxMethod.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.basicVariablesTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.objectiveFunctionTable)).EndInit();
-            this.tabPage3.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SolutionGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -580,9 +584,9 @@ namespace LabMethodOptimize
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.DataGridView objectiveFunctionTable;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;

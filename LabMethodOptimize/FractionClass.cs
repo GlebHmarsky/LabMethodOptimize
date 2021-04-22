@@ -328,6 +328,8 @@ namespace FractionArifmetic
 		/// </summary>
 		public override bool Equals(object obj)
 		{
+			if (!(obj  is Fraction)) 
+				return false;
 			Fraction frac=(Fraction)obj;
 			return ( Numerator==frac.Numerator && Denominator==frac.Denominator);
 		}

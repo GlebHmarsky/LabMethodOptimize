@@ -14,6 +14,10 @@ namespace LabMethodOptimize
 {
     public partial class Form1 : Form
     {
+        /*-------------------     GLOBAL VAR      -----------------*/
+        GaussMatrix GaussMat;
+        uint RowCount, ColumnCount;
+
         public Form1()
         {
             InitializeComponent();
@@ -38,7 +42,6 @@ namespace LabMethodOptimize
                 {
                     restrictionTable.Columns.Add(i.ToString(), "C" + i);
                     objectiveFunctionTable.Columns.Add(i.ToString(), "a" + i);
-                    basicVariablesTable.Columns.Add(i.ToString(), "X" + i);
                 }
             }
             else
@@ -48,7 +51,7 @@ namespace LabMethodOptimize
 
                     this.restrictionTable.Columns.RemoveAt(i - 1);
                     objectiveFunctionTable.Columns.RemoveAt(i - 2);
-                    basicVariablesTable.Columns.RemoveAt(i - 2);
+
 
                 }
                 if (numericUpDownColumn.Value == 0)
@@ -73,7 +76,9 @@ namespace LabMethodOptimize
 
 
             if (objectiveFunctionTable.Rows.Count == 0 && objectiveFunctionTable.Columns.Count != 0) objectiveFunctionTable.Rows.Add(1);
-            if (basicVariablesTable.Rows.Count == 0 && objectiveFunctionTable.Columns.Count != 0) basicVariablesTable.Rows.Add(1);
+            
+            restrictionTable.TopLeftHeaderCell.Value = "B/N";
+
         }
         private void numericUpDownRow_ValueChanged(object sender, EventArgs e)
         {
@@ -83,19 +88,24 @@ namespace LabMethodOptimize
                 return;
             }
             if ((int)numericUpDownRow.Value > restrictionTable.Rows.Count)
+            {
                 this.restrictionTable.Rows.Add((int)numericUpDownRow.Value - restrictionTable.Rows.Count);
+
+                for (int i = basicVariablesTable.Rows.Count; i < (int)numericUpDownRow.Value; i++)
+                {
+                    basicVariablesTable.Columns.Add(i.ToString(), "");
+                }
+
+            }
             else
             {
 
                 for (int i = restrictionTable.Rows.Count; i > (int)numericUpDownRow.Value; i--)
                 {
-                    if (i > 0)
-                        this.restrictionTable.Rows.RemoveAt(i - 1);
+                    restrictionTable.Rows.RemoveAt(i - 1);
+                    basicVariablesTable.Columns.RemoveAt(i - 1);
                 }
-                //if (numericUpDownRow.Value == 0)
-                //{
-                //    this.SimpleTable.Rows.RemoveAt(0);
-                //}
+
             }
 
             foreach (DataGridViewRow row in restrictionTable.Rows)
@@ -105,8 +115,8 @@ namespace LabMethodOptimize
                     (row.Index + 1).ToString());
             }
 
-            //if (SimpleTable.Rows.Count != 0)
-            //    SimpleTable.Rows[SimpleTable.Rows.Count - 1].HeaderCell.Value = "Z";
+
+            if (basicVariablesTable.Rows.Count == 0 && objectiveFunctionTable.Columns.Count != 0) basicVariablesTable.Rows.Add(1);
         }
         private void tableInitButton_Click(object sender, EventArgs e)
         {
@@ -182,36 +192,36 @@ namespace LabMethodOptimize
                             optimizationProblem.SelectedIndex = 1;
 
                         str = sr.ReadLine().Split(' ');
-                        
-                        uint RowCount, ColumnCount;
+
+
                         RowCount = (uint)Convert.ToInt32(str[0]);
                         ColumnCount = (uint)Convert.ToInt32(str[1]);
-                        //Solution = new FractionGausMethod(RowCount, ColumnCount);
+                        GaussMat = new GaussMatrix(RowCount, ColumnCount);
 
                         numericUpDownColumn.Value = ColumnCount;
                         numericUpDownRow.Value = RowCount;
 
                         str = sr.ReadLine().Split(' ');
-                        for (int g = 0; g < RowCount; g++)
-                        {
-                            //Solution.RightPart[i] = Convert.ToInt32(str[i]);
-                            objectiveFunctionTable[g,0].Value = Convert.ToInt32(str[g]);
+                        for (int g = 0; g < ColumnCount; g++)
+                        {                            
+                            objectiveFunctionTable[g, 0].Value = Convert.ToInt32(str[g]);
                         }
-
-                        for (int i = 0; i < RowCount; i++)
+                        int i;
+                        for (i = 0; i < RowCount; i++)
                         {
                             str = sr.ReadLine().Split(' ');
                             //UNDONE Проверки на дурака 2
                             int g;
                             for (g = 0; g < ColumnCount; g++)
                             {
-                                //Solution.Matrix[i][g] = Convert.ToInt32(str[g]);
+                                GaussMat.Matrix[i][g] = Convert.ToInt32(str[g]);
                                 restrictionTable[g, i].Value = Convert.ToInt32(str[g]);
                             }
                             restrictionTable[g, i].Value = Convert.ToInt32(str[g]);
+                            GaussMat.RightPart[i] = Convert.ToInt32(str[g]);
                         }
 
-                        
+
                     }
                 }
                 catch (Exception exp)
@@ -224,7 +234,40 @@ namespace LabMethodOptimize
 
         private void BeginSolve_Click(object sender, EventArgs e)
         {
+            // TODO Сделать повторное заполнение GaussMat перед всеми операциями. Заполнять из таблицы на форме!
+            // TODO Вызывает хороший метод из Simplex Solver и других штучек в соответсвии с выбранным решением задачи.
+            GaussMat.IndexListBasisElements.Clear();
+            if (SolutionGridView.Rows.Count < 10)SolutionGridView.Rows.Add(100);
+            int tmpInteger;
+            for (int g = 0; g < basicVariablesTable.Columns.Count; g++)
+            {
+                tmpInteger = Convert.ToInt32(basicVariablesTable[g, 0].Value);
+                if (tmpInteger != 0)
+                    GaussMat.IndexListBasisElements.Add(tmpInteger);
+                //TODO Лист НУЖНО сортировать - иначе беда в алгоритме гаусса!
+                else;
+                //TODO тогда ошибка, не добавлены все базисные переменные для текущего количества ограничений. 
+                //TODO + проверки на дурака чтобы не писали одинаковые перменные
 
+
+            }
+
+            if (GaussMat.SolveMatrix() == 1)
+            {
+                MessageBox.Show("Получил ошибку при решении!");
+                return;
+            }
+            tabControl.SelectTab(tabPage2);
+
+            for (int i = 0; i < RowCount; i++)
+            {
+                int g;
+                for (g = 0; g < ColumnCount; g++)
+                {
+                    SolutionGridView[g, i].Value = GaussMat.Matrix[i][g].ToString();
+                }
+                SolutionGridView[g, i].Value = GaussMat.RightPart[i].ToString();
+            }
         }
     }
 
