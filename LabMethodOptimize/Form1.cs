@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FractionArifmetic;
+using SimplexSolverClass;
+using GaussMatrixClass;
 
 namespace LabMethodOptimize
 {
@@ -76,7 +78,7 @@ namespace LabMethodOptimize
 
 
             if (objectiveFunctionTable.Rows.Count == 0 && objectiveFunctionTable.Columns.Count != 0) objectiveFunctionTable.Rows.Add(1);
-            
+
             restrictionTable.TopLeftHeaderCell.Value = "B/N";
 
         }
@@ -100,7 +102,7 @@ namespace LabMethodOptimize
             else
             {
 
-                for (int i = restrictionTable.Rows.Count; i > (int)numericUpDownRow.Value; i--)
+                for (int i = restrictionTable.Rows.Count; i > (int)numericUpDownRow.Value - 1; i--)
                 {
                     restrictionTable.Rows.RemoveAt(i - 1);
                     basicVariablesTable.Columns.RemoveAt(i - 1);
@@ -116,62 +118,11 @@ namespace LabMethodOptimize
             }
 
 
-            if (basicVariablesTable.Rows.Count == 0 && objectiveFunctionTable.Columns.Count != 0) basicVariablesTable.Rows.Add(1);
+            if (basicVariablesTable.Rows.Count == 0 && basicVariablesTable.Columns.Count != 0) basicVariablesTable.Rows.Add(1);
         }
-        private void tableInitButton_Click(object sender, EventArgs e)
-        {
-
-            string path = @"R:\Programming\C#\LabMethodOptimize\LabMethodOptimize\MethodOptimize.txt";
-
-            try
-            {
-                using (StreamReader sr = new StreamReader(path))
-                {
-                    string[] str = sr.ReadLine().Split(' ');
-                    // TODO:  Проверки на дурака
-
-                    if (Convert.ToInt32(str[0]) == 0)
-                        optimizationProblem.SelectedIndex = 0;
-                    else
-                        optimizationProblem.SelectedIndex = 1;
-                    str = sr.ReadLine().Split(' ');
-                    uint RowCount, ColumnCount;
-                    RowCount = (uint)Convert.ToInt32(str[0]);
-                    ColumnCount = (uint)Convert.ToInt32(str[1]);
-                    //Solution = new FractionGausMethod(RowCount, ColumnCount);
-
-                    numericUpDownColumn.Value = ColumnCount;
-                    numericUpDownRow.Value = RowCount;
-
-                    for (int i = 0; i < RowCount; i++)
-                    {
-                        str = sr.ReadLine().Split(' ');
-                        //UNDONE Проверки на дурака 2
-                        for (int g = 0; g < ColumnCount; g++)
-                        {
-                            //Solution.Matrix[i][g] = Convert.ToInt32(str[g]);
-                            restrictionTable[g, i].Value = Convert.ToInt32(str[g]);
-                        }
-                    }
-
-                    str = sr.ReadLine().Split(' ');
-                    for (int i = 0; i < RowCount; i++)
-                    {
-                        //Solution.RightPart[i] = Convert.ToInt32(str[i]);
-                    }
-                }
-            }
-            catch (Exception exp)
-            {
-                MessageBox.Show(exp.Message);
-            }
 
 
-            //Solution.SolveMatrix(); // решаем СЛАУ
-            //Console.WriteLine(Solution.ToString());// Печатаем результат
 
-
-        }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -203,7 +154,7 @@ namespace LabMethodOptimize
 
                         str = sr.ReadLine().Split(' ');
                         for (int g = 0; g < ColumnCount; g++)
-                        {                            
+                        {
                             objectiveFunctionTable[g, 0].Value = Convert.ToInt32(str[g]);
                         }
                         int i;
@@ -234,30 +185,37 @@ namespace LabMethodOptimize
 
         private void BeginSolve_Click(object sender, EventArgs e)
         {
+
+            tabControl.SelectTab(tabPage2);
+
+
             // TODO Сделать повторное заполнение GaussMat перед всеми операциями. Заполнять из таблицы на форме!
             // TODO Вызывает хороший метод из Simplex Solver и других штучек в соответсвии с выбранным решением задачи.
+
+
             GaussMat.IndexListBasisElements.Clear();
-            if (SolutionGridView.Rows.Count < 10)SolutionGridView.Rows.Add(100);
+            if (SolutionGridView.Rows.Count < 10) SolutionGridView.Rows.Add(100);
             int tmpInteger;
             for (int g = 0; g < basicVariablesTable.Columns.Count; g++)
             {
                 tmpInteger = Convert.ToInt32(basicVariablesTable[g, 0].Value);
                 if (tmpInteger != 0)
                     GaussMat.IndexListBasisElements.Add(tmpInteger);
-                //TODO Лист НУЖНО сортировать - иначе беда в алгоритме гаусса!
                 else;
                 //TODO тогда ошибка, не добавлены все базисные переменные для текущего количества ограничений. 
                 //TODO + проверки на дурака чтобы не писали одинаковые перменные
 
-
             }
 
+            GaussMat.IndexListBasisElements.Sort();
             if (GaussMat.SolveMatrix() == 1)
             {
                 MessageBox.Show("Получил ошибку при решении!");
                 return;
             }
-            tabControl.SelectTab(tabPage2);
+
+            SimplexSolver SSolver = new SimplexSolver(RowCount, ColumnCount);
+            SSolver.FillTable(GaussMat, objectiveFunctionTable.Rows[0]);
 
             for (int i = 0; i < RowCount; i++)
             {

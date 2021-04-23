@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FractionArifmetic;
 
-namespace LabMethodOptimize
+namespace GaussMatrixClass
 {
     class GaussMatrix
     {
@@ -13,13 +13,12 @@ namespace LabMethodOptimize
         public uint ColumCount;
         public Fraction[][] Matrix { get; set; }
         public Fraction[] RightPart { get; set; }
-        public Fraction[] Answer { get; set; }
         public List<int> IndexListBasisElements { get; set; }
         public GaussMatrix(uint Row, uint Colum)
         {
             IndexListBasisElements = new List<int>();
             RightPart = new Fraction[Row];
-            Answer = new Fraction[Row];
+
             Matrix = new Fraction[Row][];
             for (int i = 0; i < Row; i++)
                 Matrix[i] = new Fraction[Colum];
@@ -36,8 +35,8 @@ namespace LabMethodOptimize
             {
                 SortRows(i); // позволяет вынести ненулевой элемент столбца вверх 
                 for (int j = i + 1; j < RowCount; j++)
-                {   
-                    // TODO ИСПРАВИТЬ МЕТОДА ГАУССА ПОД СПИСОК ОБНУЛЯЕМЫХ СТОЛБЦОВ!!!!!!!
+                {
+
                     if (Matrix[i][IndexListBasisElements[i]] != 0) //если главный элемент не 0, то производим вычисления
                     {
                         MultipleCoeff = Matrix[j][IndexListBasisElements[i]] / Matrix[i][IndexListBasisElements[i]];
@@ -75,8 +74,8 @@ namespace LabMethodOptimize
                 RightPart[i] *= ReversedElement;
             }
 
-            
-            for (int i = (int)RowCount-1; i > 0; i--)
+
+            for (int i = (int)RowCount - 1; i > 0; i--)
             {
                 for (int g = 0; g < i; g++)
                 {
@@ -88,7 +87,7 @@ namespace LabMethodOptimize
                     RightPart[g] -= MultipleCoeff * RightPart[i];
                 }
             }
-            
+
             //for (int h = 0; h <= (int)(RowCount - 2); h++)// После этого цикла имеем единичную матрицу
             //{
             //    for (int i = (int)(RowCount - 2) - h; i >= 0; i--)

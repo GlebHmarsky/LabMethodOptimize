@@ -33,7 +33,6 @@ namespace LabMethodOptimize
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.numericUpDownColumn = new System.Windows.Forms.NumericUpDown();
-            this.tableInitButton = new System.Windows.Forms.Button();
             this.numericUpDownRow = new System.Windows.Forms.NumericUpDown();
             this.MainMenu = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -99,7 +98,7 @@ namespace LabMethodOptimize
             this.restrictionTable.AllowUserToResizeRows = false;
             this.restrictionTable.BackgroundColor = System.Drawing.SystemColors.Control;
             this.restrictionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.restrictionTable.Location = new System.Drawing.Point(342, 157);
+            this.restrictionTable.Location = new System.Drawing.Point(195, 157);
             this.restrictionTable.Name = "restrictionTable";
             this.restrictionTable.RowHeadersWidth = 80;
             this.restrictionTable.Size = new System.Drawing.Size(550, 344);
@@ -108,7 +107,7 @@ namespace LabMethodOptimize
             // textBox1
             // 
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox1.Location = new System.Drawing.Point(18, 82);
+            this.textBox1.Location = new System.Drawing.Point(18, 88);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.Size = new System.Drawing.Size(130, 13);
@@ -118,7 +117,7 @@ namespace LabMethodOptimize
             // textBox2
             // 
             this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox2.Location = new System.Drawing.Point(18, 19);
+            this.textBox2.Location = new System.Drawing.Point(18, 25);
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
             this.textBox2.Size = new System.Drawing.Size(130, 13);
@@ -132,16 +131,6 @@ namespace LabMethodOptimize
             this.numericUpDownColumn.Size = new System.Drawing.Size(144, 20);
             this.numericUpDownColumn.TabIndex = 7;
             this.numericUpDownColumn.ValueChanged += new System.EventHandler(this.numericUpDownColumn_ValueChanged);
-            // 
-            // tableInitButton
-            // 
-            this.tableInitButton.Location = new System.Drawing.Point(181, 44);
-            this.tableInitButton.Name = "tableInitButton";
-            this.tableInitButton.Size = new System.Drawing.Size(144, 91);
-            this.tableInitButton.TabIndex = 8;
-            this.tableInitButton.Text = "BUTT";
-            this.tableInitButton.UseVisualStyleBackColor = true;
-            this.tableInitButton.Click += new System.EventHandler(this.tableInitButton_Click);
             // 
             // numericUpDownRow
             // 
@@ -218,7 +207,6 @@ namespace LabMethodOptimize
             this.tabPage1.Controls.Add(this.objectiveFunctionTable);
             this.tabPage1.Controls.Add(this.restrictionTable);
             this.tabPage1.Controls.Add(this.numericUpDownRow);
-            this.tabPage1.Controls.Add(this.tableInitButton);
             this.tabPage1.Controls.Add(this.numericUpDownColumn);
             this.tabPage1.Controls.Add(this.textBox2);
             this.tabPage1.Controls.Add(this.textBox1);
@@ -247,7 +235,7 @@ namespace LabMethodOptimize
             this.groupBoxMethod.Controls.Add(this.radioButton1);
             this.groupBoxMethod.Location = new System.Drawing.Point(18, 157);
             this.groupBoxMethod.Name = "groupBoxMethod";
-            this.groupBoxMethod.Size = new System.Drawing.Size(144, 151);
+            this.groupBoxMethod.Size = new System.Drawing.Size(144, 141);
             this.groupBoxMethod.TabIndex = 22;
             this.groupBoxMethod.TabStop = false;
             this.groupBoxMethod.Text = "Метод решения";
@@ -331,7 +319,7 @@ namespace LabMethodOptimize
             // textBox6
             // 
             this.textBox6.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox6.Location = new System.Drawing.Point(913, 25);
+            this.textBox6.Location = new System.Drawing.Point(766, 25);
             this.textBox6.Name = "textBox6";
             this.textBox6.ReadOnly = true;
             this.textBox6.Size = new System.Drawing.Size(130, 13);
@@ -346,7 +334,7 @@ namespace LabMethodOptimize
             this.basicVariablesTable.AllowUserToResizeRows = false;
             this.basicVariablesTable.BackgroundColor = System.Drawing.SystemColors.Control;
             this.basicVariablesTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.basicVariablesTable.Location = new System.Drawing.Point(913, 44);
+            this.basicVariablesTable.Location = new System.Drawing.Point(766, 44);
             this.basicVariablesTable.Name = "basicVariablesTable";
             this.basicVariablesTable.Size = new System.Drawing.Size(550, 83);
             this.basicVariablesTable.TabIndex = 15;
@@ -354,7 +342,7 @@ namespace LabMethodOptimize
             // textBox4
             // 
             this.textBox4.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox4.Location = new System.Drawing.Point(342, 25);
+            this.textBox4.Location = new System.Drawing.Point(195, 25);
             this.textBox4.Name = "textBox4";
             this.textBox4.ReadOnly = true;
             this.textBox4.Size = new System.Drawing.Size(130, 13);
@@ -364,7 +352,7 @@ namespace LabMethodOptimize
             // textBox3
             // 
             this.textBox3.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox3.Location = new System.Drawing.Point(342, 138);
+            this.textBox3.Location = new System.Drawing.Point(195, 138);
             this.textBox3.Name = "textBox3";
             this.textBox3.ReadOnly = true;
             this.textBox3.Size = new System.Drawing.Size(130, 13);
@@ -375,7 +363,7 @@ namespace LabMethodOptimize
             // 
             this.objectiveFunctionTable.BackgroundColor = System.Drawing.SystemColors.Control;
             this.objectiveFunctionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.objectiveFunctionTable.Location = new System.Drawing.Point(342, 44);
+            this.objectiveFunctionTable.Location = new System.Drawing.Point(195, 44);
             this.objectiveFunctionTable.Name = "objectiveFunctionTable";
             this.objectiveFunctionTable.Size = new System.Drawing.Size(550, 83);
             this.objectiveFunctionTable.TabIndex = 10;
@@ -413,7 +401,7 @@ namespace LabMethodOptimize
             this.Column14,
             this.Column15,
             this.Column16});
-            this.SolutionGridView.Location = new System.Drawing.Point(45, 80);
+            this.SolutionGridView.Location = new System.Drawing.Point(8, 6);
             this.SolutionGridView.Name = "SolutionGridView";
             this.SolutionGridView.ReadOnly = true;
             this.SolutionGridView.Size = new System.Drawing.Size(1642, 251);
@@ -576,7 +564,6 @@ namespace LabMethodOptimize
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.NumericUpDown numericUpDownColumn;
-        private System.Windows.Forms.Button tableInitButton;
         private System.Windows.Forms.NumericUpDown numericUpDownRow;
         private System.Windows.Forms.MenuStrip MainMenu;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem1;
