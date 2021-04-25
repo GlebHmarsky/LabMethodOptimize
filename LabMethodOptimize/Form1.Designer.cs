@@ -77,6 +77,8 @@ namespace LabMethodOptimize
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.ButtonSimplexStep = new System.Windows.Forms.Button();
+            this.SSTextAnswer = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.restrictionTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownColumn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRow)).BeginInit();
@@ -371,6 +373,8 @@ namespace LabMethodOptimize
             // tabPage2
             // 
             this.tabPage2.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage2.Controls.Add(this.SSTextAnswer);
+            this.tabPage2.Controls.Add(this.ButtonSimplexStep);
             this.tabPage2.Controls.Add(this.SolutionGridView);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
@@ -404,7 +408,7 @@ namespace LabMethodOptimize
             this.SolutionGridView.Location = new System.Drawing.Point(8, 6);
             this.SolutionGridView.Name = "SolutionGridView";
             this.SolutionGridView.ReadOnly = true;
-            this.SolutionGridView.Size = new System.Drawing.Size(1642, 251);
+            this.SolutionGridView.Size = new System.Drawing.Size(965, 251);
             this.SolutionGridView.TabIndex = 0;
             // 
             // Column1
@@ -528,6 +532,26 @@ namespace LabMethodOptimize
             // 
             this.openFileDialog.Filter = "Text files (*.txt)|*.txt";
             // 
+            // ButtonSimplexStep
+            // 
+            this.ButtonSimplexStep.Location = new System.Drawing.Point(1026, 80);
+            this.ButtonSimplexStep.Name = "ButtonSimplexStep";
+            this.ButtonSimplexStep.Size = new System.Drawing.Size(211, 78);
+            this.ButtonSimplexStep.TabIndex = 1;
+            this.ButtonSimplexStep.Text = "Симплекс шаг";
+            this.ButtonSimplexStep.UseVisualStyleBackColor = true;
+            this.ButtonSimplexStep.Click += new System.EventHandler(this.ButtonSimplexStep_Click);
+            // 
+            // SSTextAnswer
+            // 
+            this.SSTextAnswer.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.SSTextAnswer.Location = new System.Drawing.Point(242, 370);
+            this.SSTextAnswer.Multiline = true;
+            this.SSTextAnswer.Name = "SSTextAnswer";
+            this.SSTextAnswer.ReadOnly = true;
+            this.SSTextAnswer.Size = new System.Drawing.Size(260, 60);
+            this.SSTextAnswer.TabIndex = 2;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -552,6 +576,7 @@ namespace LabMethodOptimize
             ((System.ComponentModel.ISupportInitialize)(this.basicVariablesTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.objectiveFunctionTable)).EndInit();
             this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SolutionGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -608,6 +633,8 @@ namespace LabMethodOptimize
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.Button BeginSolve;
+        private System.Windows.Forms.Button ButtonSimplexStep;
+        private System.Windows.Forms.TextBox SSTextAnswer;
     }
 }
 

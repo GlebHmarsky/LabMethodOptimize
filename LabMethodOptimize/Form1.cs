@@ -19,7 +19,8 @@ namespace LabMethodOptimize
         /*-------------------     GLOBAL VAR      -----------------*/
         GaussMatrix GaussMat;
         uint RowCount, ColumnCount;
-
+        int StartRowForSolutionGrid = 0;
+        SimplexSolver SSolver;
         public Form1()
         {
             InitializeComponent();
@@ -196,9 +197,10 @@ namespace LabMethodOptimize
             GaussMat.IndexListBasisElements.Clear();
             if (SolutionGridView.Rows.Count < 10) SolutionGridView.Rows.Add(100);
             int tmpInteger;
-            for (int g = 0; g < basicVariablesTable.Columns.Count; g++)
+            for (int k = 0; k < basicVariablesTable.Columns.Count; k++)
             {
-                tmpInteger = Convert.ToInt32(basicVariablesTable[g, 0].Value);
+                tmpInteger = Convert.ToInt32(basicVariablesTable[k, 0].Value) - 1;
+                //TODO проверить что получаю корретаные данные а не строку буквенных символов, к примеру.
                 if (tmpInteger != 0)
                     GaussMat.IndexListBasisElements.Add(tmpInteger);
                 else;
@@ -214,18 +216,103 @@ namespace LabMethodOptimize
                 return;
             }
 
-            SimplexSolver SSolver = new SimplexSolver(RowCount, ColumnCount);
+            /*SimplexSolver*/
+            SSolver = new SimplexSolver(RowCount, ColumnCount - RowCount);
             SSolver.FillTable(GaussMat, objectiveFunctionTable.Rows[0]);
 
-            for (int i = 0; i < RowCount; i++)
+            PrintResultToSoulutionGridView(SSolver);
+        }
+
+        private void ButtonSimplexStep_Click(object sender, EventArgs e)
+        {
+            //TODO добавить на проверки что всё корренктно завершилось и делать выводы из того сколько элементов нашлось
+            //TODO добавить поссле этого метода подстветку элементов на таблице
+            int returnResult;
+            returnResult = SSolver.FindBearingElements();
+            if (returnResult > 0)
             {
-                int g;
-                for (g = 0; g < ColumnCount; g++)
+                /* 
+                 * Наверное стоит блокировать кнопку, чтобы пользователь даже  не пытался посчитать таблицу, т.к. нет элементов
+                 * Но ведь это состояние уже и ответ и надо подумать что выводить. 
+                 * 
+                 * TODO Варианта 2:  Либо задача решена ||  Либо есть отрицательные столбцы, но нету элементов для прехода. 
+                 * Другими словами - система несовместна.
+                 * 
+                 * В любом из вариантов мы дальше не шагаем и выходим, но нужно понимать что возвращать пользователю.
+                 * 
+                 * Думаю, стоит пробежаться по низу и посмотреть, есть ли элементы 
+                 */
+                ButtonSimplexStep.Enabled = false;
+
+                if (returnResult == 1)
                 {
-                    SolutionGridView[g, i].Value = GaussMat.Matrix[i][g].ToString();
+                    // Всё хорошо - выводим ответ
+                    int indexBasisEl = 0;
+                    StringBuilder answer;
+                    answer = new StringBuilder("x* (");
+
+                    for (int i = 0; i < SSolver.RowCount + SSolver.ColumCount; i++)
+                    {
+                        if (SSolver.ILBasisEl.Contains(i))
+                        {
+                            answer.Append(SSolver.RightPart[SSolver.ILBasisEl.IndexOf(i)].ToString());
+                        }
+                        else
+                        {
+                            answer.Append(0.ToString());
+                        }
+                        answer.Append(",");
+                    }
+                    answer.Length--;//Удаляем последний символ.
+                    answer.Append(")");
+
+                    answer.Append($"\r\n\nf(x*) = ");
+                    answer.Append((-SSolver.OFV).ToString());
+
+                    SSTextAnswer.Text = answer.ToString();
                 }
-                SolutionGridView[g, i].Value = GaussMat.RightPart[i].ToString();
+                else if (returnResult == 2)
+                {
+                    // Всё плолохо - система несовместна
+                    SSTextAnswer.Text = $"Система не совместна\nНет решений.";
+                }
             }
+
+            SSolver.SimplexStep(); //TODO может тоже потребуется ловить возващаемое значение для проверки
+            PrintResultToSoulutionGridView(SSolver);
+        }
+
+        private void PrintResultToSoulutionGridView(SimplexSolver SSolver)
+        {
+            int i, g;
+            SolutionGridView[0, StartRowForSolutionGrid].Value = "X (" + SSolver.iteration.ToString() + ")";
+
+            for (i = 0; i < SSolver.ColumCount; i++)
+            {
+                SolutionGridView[i + 1, StartRowForSolutionGrid].Value = "X" + (SSolver.ILFreeEl[i] + 1).ToString();
+            }
+
+            StartRowForSolutionGrid++;
+
+            for (i = 0; i < SSolver.RowCount; i++)
+            {
+                SolutionGridView[0, i + StartRowForSolutionGrid].Value = "X" + (SSolver.ILBasisEl[i] + 1).ToString();
+                for (g = 0; g < SSolver.ColumCount; g++)
+                {
+                    SolutionGridView[g + 1, i + StartRowForSolutionGrid].Value = SSolver.Matrix[i][g].ToString();
+                }
+                SolutionGridView[g + 1, i + StartRowForSolutionGrid].Value = SSolver.RightPart[i].ToString();
+            }
+
+
+            for (g = 0; g < SSolver.ColumCount; g++)
+            {
+                SolutionGridView[g + 1, i + StartRowForSolutionGrid].Value = SSolver.ObjFuncion[g].ToString();
+            }
+            SolutionGridView[g + 1, i + StartRowForSolutionGrid].Value = SSolver.OFV.ToString();
+
+            StartRowForSolutionGrid += i + 2;
+            //SolutionGridView[0, StartRowForSolutionGrid].Value = "u here!";
         }
     }
 
