@@ -41,17 +41,17 @@ namespace SimplexSolverClass
             RowCount = Row;
             ColumCount = Colum;
 
-            bearingEls = new List<int[]>();            
+            bearingEls = new List<int[]>();
         }
         /*
          * Заполняет симплекс таблицу из таблицы гаусса 
          * Можно считать это корректной инициилазцией объекта и началом работы с самой симплекс таблицей
          */
-        public void FillTable(GaussMatrix gaussM, DataGridViewRow initObjFunc)
+        public void FillTable(GaussMatrix gaussM, DataGridViewRow initObjFunc, bool fFindMax)
         {
             ILBasisEl = new List<int>(gaussM.IndexListBasisElements);
 
-            for (int i = 0; i < (ColumCount - 1) + (RowCount - 1); i++)
+            for (int i = 0; i < ColumCount + RowCount; i++)
             {
                 if (!ILBasisEl.Contains(i)) ILFreeEl.Add(i);
             }
@@ -65,24 +65,25 @@ namespace SimplexSolverClass
             }
 
             RightPart = gaussM.RightPart;
-            CalculateObjectiveFunction(initObjFunc);
-            CalculateObjectiveFunctionValue(initObjFunc);
+            CalculateObjectiveFunction(initObjFunc, fFindMax);
+            CalculateObjectiveFunctionValue(initObjFunc, fFindMax);
         }
 
-        private void CalculateObjectiveFunction(DataGridViewRow initObjFunc)
+        private void CalculateObjectiveFunction(DataGridViewRow initObjFunc, bool fFindMax)
         {
             for (int i = 0; i < ColumCount; i++)
             {
                 Fraction Result = new Fraction(0);
                 for (int g = 0; g < RowCount; g++)
                 {
-                    Result += -Matrix[g][i] * (new Fraction(initObjFunc.Cells[ILBasisEl[g]].Value.ToString()));
+                    Result += (-Matrix[g][i]) * (new Fraction(initObjFunc.Cells[ILBasisEl[g]].Value.ToString()));
                 }
 
-                ObjFuncion[i] = Result + (new Fraction(initObjFunc.Cells[ILFreeEl[i]].Value.ToString()));
+                if (fFindMax) ObjFuncion[i] = -(Result + (new Fraction(initObjFunc.Cells[ILFreeEl[i]].Value.ToString())));
+                else ObjFuncion[i] = Result + (new Fraction(initObjFunc.Cells[ILFreeEl[i]].Value.ToString()));
             }
         }
-        private void CalculateObjectiveFunctionValue(DataGridViewRow initObjFunc)
+        private void CalculateObjectiveFunctionValue(DataGridViewRow initObjFunc, bool fFindMax)
         {
             Fraction Result = new Fraction(0);
             for (int i = 0; i < RowCount; i++)
@@ -90,7 +91,8 @@ namespace SimplexSolverClass
                 Result += RightPart[i] * (new Fraction(initObjFunc.Cells[ILBasisEl[i]].Value.ToString()));
             }
 
-            OFV = -Result;
+            if (fFindMax) OFV = Result;
+            else OFV = -Result;
         }
 
         public int FindBearingElements()
@@ -116,7 +118,7 @@ namespace SimplexSolverClass
                         }
                     }
 
-                    for (int g = indexBasisEl+1; g < RowCount; g++) //Ищет минимальный элемент в столбце. 
+                    for (int g = indexBasisEl + 1; g < RowCount; g++) //Ищет минимальный элемент в столбце. 
                     {
 
                         if (Matrix[g][i] > 0)
@@ -131,16 +133,16 @@ namespace SimplexSolverClass
 
                 }
                 if (indexBasisEl >= 0) //Нашёлся такой элемент в столбце
-                {                    
+                {
                     bearingEls.Add(new int[2] { indexBasisEl, indexFreeEl });
                 }
-                
+
 
 
             }//Конец цикла по столбцам
             if (bearingEls.Count == 0)//Список пуст, элементов для шага нету.
             {
-                if(indexFreeEl >= 0) // Т.е. нашёлся такой столбец где снизу отрицательный элемент, но переход не осуществим. 
+                if (indexFreeEl >= 0) // Т.е. нашёлся такой столбец где снизу отрицательный элемент, но переход не осуществим. 
                 {
                     return 2; //Сигнал о том что задача несовместна.
                 }
@@ -148,14 +150,14 @@ namespace SimplexSolverClass
             }
             return 0;
         }
-        
+
         /// <summary>
         /// index - переменная отвечающая за номер опорного элемента (слева направо)
         /// </summary>
         /// <param name="indexBearingEl"></param>
         public void SimplexStepWithCurrentEl(int indexBearingEl)
         {
-            if(indexBearingEl >= bearingEls.Count)
+            if (indexBearingEl >= bearingEls.Count)
             {
                 MessageBox.Show("Такого опорного элемента не сущетвует");
                 return;
@@ -173,7 +175,7 @@ namespace SimplexSolverClass
             Fraction[] NewRightPart = new Fraction[RowCount];
             Fraction[] NewObjFuncion = new Fraction[ColumCount];
             Fraction NewOFV = new Fraction();
-            
+
             for (int i = 0; i < RowCount; i++)
                 NewMatrix[i] = new Fraction[ColumCount];
             // four steps to succes;
@@ -223,40 +225,36 @@ namespace SimplexSolverClass
             bearingEls.Clear();//Списко опорных элементов изменился для новой таблицы, поэтому его нужно перестраивать.
             iteration++;
         }
-        public int SimplexStep()
+        /// <summary>
+        /// находим оптимальный вариант (выбираем максимальный элемент по модулю снизу)
+        /// </summary>
+        /// <returns></returns>
+        public int FindOptimalBearingElement()
         {
-            /*
-             * Пробежаться по низу
-             * Найти все возможные опрорные элемент
-             * Найти максимальный по модулю коэфф целевой функции
-             * Подсветить этот элемент как выбранный при счёте
-             * остальные просто позволять кликать.
-             * 
-             * Если при пробеге мы ничего не наберём в список возможных элементов - это знак что либо всё плохо и система несовместна
-             * либо что решение найдено и более шагов делать не надо
-             */
-
-
-            
-
             if (bearingEls.Count == 0)
             {
-                return 1; //Нету элементов для симплекс шага.
+                return -1; //Нету элементов для поиска.
             }
-
-            //находим оптимальный вариант (выбираем максимальный элемент по модулю снизу)
             int optimalIndex = 0;
             Fraction MaxEl = Fraction.Abs(ObjFuncion[bearingEls[0][1]]); //Кладём максимальный по модулю элемент в опорном столбце из целевой функции
             for (int i = 1; i < bearingEls.Count; i++)
             {
-                if(MaxEl< Fraction.Abs(ObjFuncion[bearingEls[i][1]]))
+                if (MaxEl < Fraction.Abs(ObjFuncion[bearingEls[i][1]]))
                 {
                     optimalIndex = i;
                     MaxEl = Fraction.Abs(ObjFuncion[bearingEls[i][1]]);
                 }
             }
-            SimplexStepWithCurrentEl(optimalIndex);
-            
+            return optimalIndex;
+        }
+        public int SimplexStep()
+        {
+            if (bearingEls.Count == 0)
+            {
+                return 1; //Нету элементов для симплекс шага.
+            }
+            SimplexStepWithCurrentEl(FindOptimalBearingElement());
+
             return 0; //Всё успешно.
         }
     }

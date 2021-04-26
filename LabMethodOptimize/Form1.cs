@@ -21,6 +21,12 @@ namespace LabMethodOptimize
         uint RowCount, ColumnCount;
         int StartRowForSolutionGrid = 0;
         SimplexSolver SSolver;
+        int pivotIndex;
+
+        DataGridViewCellStyle LightCoralStyle = new DataGridViewCellStyle();
+        DataGridViewCellStyle AquamarineStyle = new DataGridViewCellStyle();
+        
+
         public Form1()
         {
             InitializeComponent();
@@ -28,6 +34,13 @@ namespace LabMethodOptimize
             fractionType.SelectedIndex = 0;
             radioButton1.Checked = true;
 
+            LightCoralStyle.BackColor = Color.LightCoral;
+            LightCoralStyle.ForeColor = Color.Black;
+
+            AquamarineStyle.BackColor = Color.Aquamarine;
+            AquamarineStyle.ForeColor = Color.Black;
+
+            SolutionGridView.RowHeadersWidth = 4; 
         }
 
 
@@ -201,7 +214,7 @@ namespace LabMethodOptimize
             {
                 tmpInteger = Convert.ToInt32(basicVariablesTable[k, 0].Value) - 1;
                 //TODO проверить что получаю корретаные данные а не строку буквенных символов, к примеру.
-                if (tmpInteger != 0)
+                if (tmpInteger >= 0 && tmpInteger <= ColumnCount)
                     GaussMat.IndexListBasisElements.Add(tmpInteger);
                 else;
                 //TODO тогда ошибка, не добавлены все базисные переменные для текущего количества ограничений. 
@@ -218,17 +231,38 @@ namespace LabMethodOptimize
 
             /*SimplexSolver*/
             SSolver = new SimplexSolver(RowCount, ColumnCount - RowCount);
-            SSolver.FillTable(GaussMat, objectiveFunctionTable.Rows[0]);
+            SSolver.FillTable(GaussMat, objectiveFunctionTable.Rows[0], optimizationProblem.SelectedIndex == 1);
 
             PrintResultToSoulutionGridView(SSolver);
+            FindAndCheckBearingElements();
+            pivotIndex = SSolver.FindOptimalBearingElement();
+            ColorTheBearingEletemts();
+            //TODO Проверить что после подсчёта симплекс таблицы у нас справа нету отрицательных элементов
+            //TODO и в случае чего остановить дальнейшую работу приложения по причине некорректного базиса
         }
 
-        private void ButtonSimplexStep_Click(object sender, EventArgs e)
+        private void ColorTheBearingEletemts()
         {
-            //TODO добавить на проверки что всё корренктно завершилось и делать выводы из того сколько элементов нашлось
-            //TODO добавить поссле этого метода подстветку элементов на таблице
+            if (SSolver.bearingEls.Count == 0) return;
+
+            int iRow, iColum;
+            int StartRowOfCurTable = StartRowForSolutionGrid - 2 - (int)SSolver.RowCount;
+            for (int i = 0; i < SSolver.bearingEls.Count; i++)
+            {
+                iRow = SSolver.bearingEls[i][0];
+                iColum = SSolver.bearingEls[i][1];
+                SolutionGridView[iColum + 1, StartRowOfCurTable + iRow].Style = AquamarineStyle;
+            }            
+            iRow = SSolver.bearingEls[pivotIndex][0];
+            iColum = SSolver.bearingEls[pivotIndex][1]; 
+             SolutionGridView[iColum + 1, StartRowOfCurTable + iRow].Style = LightCoralStyle;
+        }
+        private void FindAndCheckBearingElements()
+        {
             int returnResult;
             returnResult = SSolver.FindBearingElements();
+            //TODO добавить на проверки что всё корренктно завершилось и делать выводы из того сколько элементов нашлось
+            //TODO добавить поссле этого метода подстветку элементов на таблице
             if (returnResult > 0)
             {
                 /* 
@@ -247,7 +281,7 @@ namespace LabMethodOptimize
                 if (returnResult == 1)
                 {
                     // Всё хорошо - выводим ответ
-                    int indexBasisEl = 0;
+
                     StringBuilder answer;
                     answer = new StringBuilder("x* (");
 
@@ -266,24 +300,83 @@ namespace LabMethodOptimize
                     answer.Length--;//Удаляем последний символ.
                     answer.Append(")");
 
-                    answer.Append($"\r\n\nf(x*) = ");
-                    answer.Append((-SSolver.OFV).ToString());
+                    answer.Append($"\r\n\nf(x*) = {(-SSolver.OFV).ToString()}");
 
                     SSTextAnswer.Text = answer.ToString();
                 }
                 else if (returnResult == 2)
                 {
                     // Всё плолохо - система несовместна
-                    SSTextAnswer.Text = $"Система не совместна\nНет решений.";
+                    SSTextAnswer.Text = "Система не совместна\nНет решений.";
                 }
             }
-
+        }
+        private void ButtonSimplexStep_Click(object sender, EventArgs e)
+        {
             SSolver.SimplexStep(); //TODO может тоже потребуется ловить возващаемое значение для проверки
             PrintResultToSoulutionGridView(SSolver);
+
+            FindAndCheckBearingElements();
+            if((pivotIndex = SSolver.FindOptimalBearingElement()) < 0)
+            {
+                //Нету элементов и надо выходить
+                return;
+            }
+            ColorTheBearingEletemts();
+           
+        }
+
+        private void SolutionGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            int StartRowOfCurTable = StartRowForSolutionGrid - 2 - (int)SSolver.RowCount;
+            int[] tmpArr = new int[2] { e.RowIndex, e.ColumnIndex };
+            //bool res = SSolver.bearingEls.Exists(x => (x[0] == e.RowIndex && x[1] == e.ColumnIndex));
+            int coolIndex;
+            coolIndex = SSolver.bearingEls.IndexOf(tmpArr);
+            if (coolIndex >= 0)
+            {
+                SolutionGridView[SSolver.bearingEls[pivotIndex][1], SSolver.bearingEls[pivotIndex][0]].Style = AquamarineStyle;
+                pivotIndex = coolIndex;
+                SolutionGridView[SSolver.bearingEls[pivotIndex][1], SSolver.bearingEls[pivotIndex][0]].Style = LightCoralStyle;
+            }
+            //Иначе Пользователь клацнул не туда, так что ничего не делаем
+
+        }
+        private int BearingElsIndexOf(int[] arr)
+        {
+            int index = -1;
+            for (int i = 0; i < SSolver.bearingEls.Count; i++)
+            {
+                if(SSolver.bearingEls[i][0] == arr[0] && SSolver.bearingEls[i][1] == arr[1])
+                {
+                    index = i;
+                    break;
+                }
+            }
+            return index;
+        }
+        private void SolutionGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            int StartRowOfCurTable = StartRowForSolutionGrid - 2 - (int)SSolver.RowCount;
+            int[] tmpArr = new int[2] { e.RowIndex - StartRowOfCurTable, e.ColumnIndex - 1};
+            bool res = SSolver.bearingEls.Exists(x => (x[0] == tmpArr[0] && x[1] == tmpArr[1]));
+            int coolIndex;
+            coolIndex = BearingElsIndexOf(tmpArr);
+            if (coolIndex >= 0 && coolIndex != pivotIndex)
+            {                
+                SolutionGridView[SSolver.bearingEls[pivotIndex][1] + 1, SSolver.bearingEls[pivotIndex][0] + StartRowOfCurTable].Style = AquamarineStyle;
+                pivotIndex = coolIndex;
+                SolutionGridView[SSolver.bearingEls[pivotIndex][1] + 1, SSolver.bearingEls[pivotIndex][0] + StartRowOfCurTable].Style = LightCoralStyle;
+            }
+            //Иначе Пользователь клацнул не туда, так что ничего не делаем
         }
 
         private void PrintResultToSoulutionGridView(SimplexSolver SSolver)
         {
+            //TODO Сделать проверку что если новая таблица вылетает за границы то перетаскивать скролл ниже 
+            //SolutionGridView.FirstDisplayedScrollingRowIndex = StartRowForSolutionGrid;
+
+
             int i, g;
             SolutionGridView[0, StartRowForSolutionGrid].Value = "X (" + SSolver.iteration.ToString() + ")";
 
