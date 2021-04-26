@@ -98,6 +98,7 @@ namespace SimplexSolverClass
         public int FindBearingElements()
         {
             int indexFreeEl = -1, indexBasisEl = -1;
+            bool fHaveNegativeCol = false;
             for (int i = 0; i < ColumCount; i++)
             {
                 indexFreeEl = -1;
@@ -108,6 +109,7 @@ namespace SimplexSolverClass
                 {
                     indexFreeEl = i; //запоминаем столбец где есть отрицательный элемент снизу
                     //Нужно подобрать первый подходящий минимальный элемент. 
+                    fHaveNegativeCol = true;
                     for (int g = 0; g < RowCount; g++)//Ищет первый попавшийся хороший элемент в столбце
                     {
                         if (Matrix[g][i] > 0)
@@ -142,7 +144,7 @@ namespace SimplexSolverClass
             }//Конец цикла по столбцам
             if (bearingEls.Count == 0)//Список пуст, элементов для шага нету.
             {
-                if (indexFreeEl >= 0) // Т.е. нашёлся такой столбец где снизу отрицательный элемент, но переход не осуществим. 
+                if (fHaveNegativeCol) // Т.е. нашёлся такой столбец где снизу отрицательный элемент, но переход не осуществим. 
                 {
                     return 2; //Сигнал о том что задача несовместна.
                 }

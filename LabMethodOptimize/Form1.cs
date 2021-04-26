@@ -234,11 +234,21 @@ namespace LabMethodOptimize
             SSolver.FillTable(GaussMat, objectiveFunctionTable.Rows[0], optimizationProblem.SelectedIndex == 1);
 
             PrintResultToSoulutionGridView(SSolver);
+            //TODO Проверить что после подсчёта симплекс таблицы у нас справа нету отрицательных элементов
+            bool OnRightHaveNegativeEl = SSolver.RightPart.Any(x => x < 0);
+            if (OnRightHaveNegativeEl)
+            {
+                ButtonSimplexStep.Enabled = false;
+                SSTextAnswer.Text = "Плохой базис.\r\nПожалуйста, больше так не делайте.";
+                return;
+            }
+            
             FindAndCheckBearingElements();
             pivotIndex = SSolver.FindOptimalBearingElement();
             ColorTheBearingEletemts();
-            //TODO Проверить что после подсчёта симплекс таблицы у нас справа нету отрицательных элементов
-            //TODO и в случае чего остановить дальнейшую работу приложения по причине некорректного базиса
+            
+            
+            
         }
 
         private void ColorTheBearingEletemts()
@@ -307,7 +317,8 @@ namespace LabMethodOptimize
                 else if (returnResult == 2)
                 {
                     // Всё плолохо - система несовместна
-                    SSTextAnswer.Text = "Система не совместна\nНет решений.";
+                    StringBuilder answer = new StringBuilder("Система несовместна\r\nНет решений.");
+                    SSTextAnswer.Text = answer.ToString();
                 }
             }
         }
@@ -353,6 +364,166 @@ namespace LabMethodOptimize
                 SolutionGridView[SSolver.bearingEls[pivotIndex][1] + 1, SSolver.bearingEls[pivotIndex][0] + StartRowOfCurTable].Style = LightCoralStyle;
             }
             //Иначе Пользователь клацнул не туда, так что ничего не делаем
+        }
+
+        private void tabPage1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void restrictionTable_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MainMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void fileToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBoxMethod_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void fractionType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox8_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void optimizationProblem_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox7_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox6_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void objectiveFunctionTable_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void tabPage2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox9_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void SSTextAnswer_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void SolutionGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void tabPage3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tabPage4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void saveFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
+
+        }
+
+        private void openFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
+
         }
 
         private void PrintResultToSoulutionGridView(SimplexSolver SSolver)
