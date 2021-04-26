@@ -56,6 +56,10 @@ namespace LabMethodOptimize
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.objectiveFunctionTable = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.textBox9 = new System.Windows.Forms.TextBox();
+            this.textBox5 = new System.Windows.Forms.TextBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.SSTextAnswer = new System.Windows.Forms.TextBox();
             this.ButtonSimplexStep = new System.Windows.Forms.Button();
             this.SolutionGridView = new System.Windows.Forms.DataGridView();
@@ -79,10 +83,6 @@ namespace LabMethodOptimize
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.textBox5 = new System.Windows.Forms.TextBox();
-            this.textBox9 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.restrictionTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownColumn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRow)).BeginInit();
@@ -391,6 +391,42 @@ namespace LabMethodOptimize
             this.tabPage2.TabIndex = 4;
             this.tabPage2.Text = "Симплекс метод";
             // 
+            // textBox9
+            // 
+            this.textBox9.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.textBox9.Location = new System.Drawing.Point(565, 515);
+            this.textBox9.Name = "textBox9";
+            this.textBox9.ReadOnly = true;
+            this.textBox9.Size = new System.Drawing.Size(256, 24);
+            this.textBox9.TabIndex = 6;
+            this.textBox9.Text = "Выбранный опорный элемент";
+            // 
+            // textBox5
+            // 
+            this.textBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.textBox5.Location = new System.Drawing.Point(565, 471);
+            this.textBox5.Name = "textBox5";
+            this.textBox5.ReadOnly = true;
+            this.textBox5.Size = new System.Drawing.Size(256, 24);
+            this.textBox5.TabIndex = 5;
+            this.textBox5.Text = "Возможный опорный элемент";
+            // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.Color.LightCoral;
+            this.panel2.Location = new System.Drawing.Point(533, 515);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(26, 24);
+            this.panel2.TabIndex = 4;
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.Color.Aquamarine;
+            this.panel1.Location = new System.Drawing.Point(533, 472);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(26, 23);
+            this.panel1.TabIndex = 3;
+            // 
             // SSTextAnswer
             // 
             this.SSTextAnswer.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
@@ -439,7 +475,6 @@ namespace LabMethodOptimize
             this.SolutionGridView.Size = new System.Drawing.Size(965, 429);
             this.SolutionGridView.TabIndex = 0;
             this.SolutionGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SolutionGridView_CellClick);
-            this.SolutionGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SolutionGridView_CellContentClick);
             // 
             // Column1
             // 
@@ -561,42 +596,6 @@ namespace LabMethodOptimize
             // openFileDialog
             // 
             this.openFileDialog.Filter = "Text files (*.txt)|*.txt";
-            // 
-            // panel1
-            // 
-            this.panel1.BackColor = System.Drawing.Color.Aquamarine;
-            this.panel1.Location = new System.Drawing.Point(533, 472);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(26, 23);
-            this.panel1.TabIndex = 3;
-            // 
-            // panel2
-            // 
-            this.panel2.BackColor = System.Drawing.Color.LightCoral;
-            this.panel2.Location = new System.Drawing.Point(533, 515);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(26, 24);
-            this.panel2.TabIndex = 4;
-            // 
-            // textBox5
-            // 
-            this.textBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.textBox5.Location = new System.Drawing.Point(565, 471);
-            this.textBox5.Name = "textBox5";
-            this.textBox5.ReadOnly = true;
-            this.textBox5.Size = new System.Drawing.Size(256, 24);
-            this.textBox5.TabIndex = 5;
-            this.textBox5.Text = "Возможный опорный элемент";
-            // 
-            // textBox9
-            // 
-            this.textBox9.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.textBox9.Location = new System.Drawing.Point(565, 515);
-            this.textBox9.Name = "textBox9";
-            this.textBox9.ReadOnly = true;
-            this.textBox9.Size = new System.Drawing.Size(256, 24);
-            this.textBox9.TabIndex = 6;
-            this.textBox9.Text = "Выбранный опорный элемент";
             // 
             // Form1
             // 

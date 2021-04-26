@@ -313,7 +313,7 @@ namespace LabMethodOptimize
         }
         private void ButtonSimplexStep_Click(object sender, EventArgs e)
         {
-            SSolver.SimplexStep(); //TODO может тоже потребуется ловить возващаемое значение для проверки
+            SSolver.SimplexStepWithCurrentEl(pivotIndex); //TODO может тоже потребуется ловить возващаемое значение для проверки
             PrintResultToSoulutionGridView(SSolver);
 
             FindAndCheckBearingElements();
@@ -326,22 +326,6 @@ namespace LabMethodOptimize
            
         }
 
-        private void SolutionGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            int StartRowOfCurTable = StartRowForSolutionGrid - 2 - (int)SSolver.RowCount;
-            int[] tmpArr = new int[2] { e.RowIndex, e.ColumnIndex };
-            //bool res = SSolver.bearingEls.Exists(x => (x[0] == e.RowIndex && x[1] == e.ColumnIndex));
-            int coolIndex;
-            coolIndex = SSolver.bearingEls.IndexOf(tmpArr);
-            if (coolIndex >= 0)
-            {
-                SolutionGridView[SSolver.bearingEls[pivotIndex][1], SSolver.bearingEls[pivotIndex][0]].Style = AquamarineStyle;
-                pivotIndex = coolIndex;
-                SolutionGridView[SSolver.bearingEls[pivotIndex][1], SSolver.bearingEls[pivotIndex][0]].Style = LightCoralStyle;
-            }
-            //Иначе Пользователь клацнул не туда, так что ничего не делаем
-
-        }
         private int BearingElsIndexOf(int[] arr)
         {
             int index = -1;
