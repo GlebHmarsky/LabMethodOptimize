@@ -43,9 +43,9 @@ namespace LabMethodOptimize
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.BeginSolve = new System.Windows.Forms.Button();
             this.groupBoxMethod = new System.Windows.Forms.GroupBox();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.RBGraphic = new System.Windows.Forms.RadioButton();
+            this.RBArtificial = new System.Windows.Forms.RadioButton();
+            this.RBSimplexMethod = new System.Windows.Forms.RadioButton();
             this.fractionType = new System.Windows.Forms.ComboBox();
             this.textBox8 = new System.Windows.Forms.TextBox();
             this.optimizationProblem = new System.Windows.Forms.ComboBox();
@@ -62,27 +62,20 @@ namespace LabMethodOptimize
             this.panel1 = new System.Windows.Forms.Panel();
             this.SSTextAnswer = new System.Windows.Forms.TextBox();
             this.ButtonSimplexStep = new System.Windows.Forms.Button();
-            this.SolutionGridView = new System.Windows.Forms.DataGridView();
-            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column15 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column16 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SSolutionTable = new System.Windows.Forms.DataGridView();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.textBox10 = new System.Windows.Forms.TextBox();
+            this.textBox11 = new System.Windows.Forms.TextBox();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.panel4 = new System.Windows.Forms.Panel();
+            this.ABAnswerText = new System.Windows.Forms.TextBox();
+            this.ABStepButton = new System.Windows.Forms.Button();
+            this.ABSolverTable = new System.Windows.Forms.DataGridView();
+            this.GAnswerText = new System.Windows.Forms.TextBox();
+            this.GSSolutionTable = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.restrictionTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownColumn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRow)).BeginInit();
@@ -93,7 +86,11 @@ namespace LabMethodOptimize
             ((System.ComponentModel.ISupportInitialize)(this.basicVariablesTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.objectiveFunctionTable)).BeginInit();
             this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SolutionGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SSolutionTable)).BeginInit();
+            this.tabPage3.SuspendLayout();
+            this.tabPage4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ABSolverTable)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.GSSolutionTable)).BeginInit();
             this.SuspendLayout();
             // 
             // restrictionTable
@@ -104,11 +101,12 @@ namespace LabMethodOptimize
             this.restrictionTable.AllowUserToResizeRows = false;
             this.restrictionTable.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(229)))), ((int)(((byte)(238)))));
             this.restrictionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.restrictionTable.Location = new System.Drawing.Point(195, 163);
+            this.restrictionTable.Location = new System.Drawing.Point(195, 155);
             this.restrictionTable.Name = "restrictionTable";
             this.restrictionTable.RowHeadersWidth = 80;
             this.restrictionTable.Size = new System.Drawing.Size(550, 344);
             this.restrictionTable.TabIndex = 0;
+            this.restrictionTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.restrictionTable_CellValueChanged);
             // 
             // textBox1
             // 
@@ -137,14 +135,24 @@ namespace LabMethodOptimize
             // numericUpDownColumn
             // 
             this.numericUpDownColumn.Location = new System.Drawing.Point(18, 44);
+            this.numericUpDownColumn.Maximum = new decimal(new int[] {
+            16,
+            0,
+            0,
+            0});
             this.numericUpDownColumn.Name = "numericUpDownColumn";
             this.numericUpDownColumn.Size = new System.Drawing.Size(154, 21);
             this.numericUpDownColumn.TabIndex = 7;
-            this.numericUpDownColumn.ValueChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
+            this.numericUpDownColumn.ValueChanged += new System.EventHandler(this.numericUpDownColumn_ValueChanged);
             // 
             // numericUpDownRow
             // 
             this.numericUpDownRow.Location = new System.Drawing.Point(18, 107);
+            this.numericUpDownRow.Maximum = new decimal(new int[] {
+            16,
+            0,
+            0,
+            0});
             this.numericUpDownRow.Name = "numericUpDownRow";
             this.numericUpDownRow.Size = new System.Drawing.Size(154, 21);
             this.numericUpDownRow.TabIndex = 9;
@@ -158,7 +166,7 @@ namespace LabMethodOptimize
             this.aboutToolStripMenuItem});
             this.MainMenu.Location = new System.Drawing.Point(0, 0);
             this.MainMenu.Name = "MainMenu";
-            this.MainMenu.Size = new System.Drawing.Size(1838, 24);
+            this.MainMenu.Size = new System.Drawing.Size(1410, 24);
             this.MainMenu.TabIndex = 11;
             this.MainMenu.Text = "menuStrip1";
             this.MainMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.MainMenu_ItemClicked);
@@ -176,14 +184,14 @@ namespace LabMethodOptimize
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -248,52 +256,52 @@ namespace LabMethodOptimize
             // 
             // groupBoxMethod
             // 
-            this.groupBoxMethod.Controls.Add(this.radioButton3);
-            this.groupBoxMethod.Controls.Add(this.radioButton2);
-            this.groupBoxMethod.Controls.Add(this.radioButton1);
+            this.groupBoxMethod.Controls.Add(this.RBGraphic);
+            this.groupBoxMethod.Controls.Add(this.RBArtificial);
+            this.groupBoxMethod.Controls.Add(this.RBSimplexMethod);
             this.groupBoxMethod.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.groupBoxMethod.Location = new System.Drawing.Point(18, 156);
+            this.groupBoxMethod.Location = new System.Drawing.Point(18, 148);
             this.groupBoxMethod.Name = "groupBoxMethod";
             this.groupBoxMethod.Size = new System.Drawing.Size(154, 141);
             this.groupBoxMethod.TabIndex = 22;
             this.groupBoxMethod.TabStop = false;
             this.groupBoxMethod.Text = "Метод решения";
             // 
-            // radioButton3
+            // RBGraphic
             // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(6, 99);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(143, 19);
-            this.radioButton3.TabIndex = 23;
-            this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Графический метод";
-            this.radioButton3.UseVisualStyleBackColor = true;
-            this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
+            this.RBGraphic.AutoSize = true;
+            this.RBGraphic.Location = new System.Drawing.Point(6, 99);
+            this.RBGraphic.Name = "RBGraphic";
+            this.RBGraphic.Size = new System.Drawing.Size(143, 19);
+            this.RBGraphic.TabIndex = 23;
+            this.RBGraphic.TabStop = true;
+            this.RBGraphic.Text = "Графический метод";
+            this.RBGraphic.UseVisualStyleBackColor = true;
+            this.RBGraphic.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
             // 
-            // radioButton2
+            // RBArtificial
             // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(6, 67);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(132, 19);
-            this.radioButton2.TabIndex = 22;
-            this.radioButton2.TabStop = true;
-            this.radioButton2.Text = "Метод иск. базиса";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            this.RBArtificial.AutoSize = true;
+            this.RBArtificial.Location = new System.Drawing.Point(6, 67);
+            this.RBArtificial.Name = "RBArtificial";
+            this.RBArtificial.Size = new System.Drawing.Size(132, 19);
+            this.RBArtificial.TabIndex = 22;
+            this.RBArtificial.TabStop = true;
+            this.RBArtificial.Text = "Метод иск. базиса";
+            this.RBArtificial.UseVisualStyleBackColor = true;
+            this.RBArtificial.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
             // 
-            // radioButton1
+            // RBSimplexMethod
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(6, 35);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(122, 19);
-            this.radioButton1.TabIndex = 21;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "Симплекс метод";
-            this.radioButton1.UseVisualStyleBackColor = true;
-            this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
+            this.RBSimplexMethod.AutoSize = true;
+            this.RBSimplexMethod.Location = new System.Drawing.Point(6, 35);
+            this.RBSimplexMethod.Name = "RBSimplexMethod";
+            this.RBSimplexMethod.Size = new System.Drawing.Size(122, 19);
+            this.RBSimplexMethod.TabIndex = 21;
+            this.RBSimplexMethod.TabStop = true;
+            this.RBSimplexMethod.Text = "Симплекс метод";
+            this.RBSimplexMethod.UseVisualStyleBackColor = true;
+            this.RBSimplexMethod.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
             // 
             // fractionType
             // 
@@ -301,7 +309,7 @@ namespace LabMethodOptimize
             this.fractionType.Items.AddRange(new object[] {
             "Простые",
             "Десятичные"});
-            this.fractionType.Location = new System.Drawing.Point(18, 411);
+            this.fractionType.Location = new System.Drawing.Point(18, 406);
             this.fractionType.Name = "fractionType";
             this.fractionType.Size = new System.Drawing.Size(154, 23);
             this.fractionType.TabIndex = 20;
@@ -312,7 +320,7 @@ namespace LabMethodOptimize
             this.textBox8.BackColor = System.Drawing.Color.Ivory;
             this.textBox8.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox8.Location = new System.Drawing.Point(18, 392);
+            this.textBox8.Location = new System.Drawing.Point(18, 387);
             this.textBox8.Name = "textBox8";
             this.textBox8.ReadOnly = true;
             this.textBox8.Size = new System.Drawing.Size(130, 14);
@@ -326,7 +334,7 @@ namespace LabMethodOptimize
             this.optimizationProblem.Items.AddRange(new object[] {
             "Мин",
             "Макс"});
-            this.optimizationProblem.Location = new System.Drawing.Point(18, 347);
+            this.optimizationProblem.Location = new System.Drawing.Point(18, 342);
             this.optimizationProblem.Name = "optimizationProblem";
             this.optimizationProblem.Size = new System.Drawing.Size(154, 23);
             this.optimizationProblem.TabIndex = 18;
@@ -337,7 +345,7 @@ namespace LabMethodOptimize
             this.textBox7.BackColor = System.Drawing.Color.Ivory;
             this.textBox7.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox7.Location = new System.Drawing.Point(18, 328);
+            this.textBox7.Location = new System.Drawing.Point(18, 323);
             this.textBox7.Name = "textBox7";
             this.textBox7.ReadOnly = true;
             this.textBox7.Size = new System.Drawing.Size(130, 14);
@@ -367,7 +375,8 @@ namespace LabMethodOptimize
             this.basicVariablesTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.basicVariablesTable.Location = new System.Drawing.Point(766, 44);
             this.basicVariablesTable.Name = "basicVariablesTable";
-            this.basicVariablesTable.Size = new System.Drawing.Size(550, 83);
+            this.basicVariablesTable.RowTemplate.Height = 30;
+            this.basicVariablesTable.Size = new System.Drawing.Size(550, 45);
             this.basicVariablesTable.TabIndex = 15;
             this.basicVariablesTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.basicVariablesTable_CellValueChanged);
             // 
@@ -390,7 +399,7 @@ namespace LabMethodOptimize
             this.textBox3.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 17F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.textBox3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox3.Location = new System.Drawing.Point(197, 140);
+            this.textBox3.Location = new System.Drawing.Point(197, 132);
             this.textBox3.Name = "textBox3";
             this.textBox3.ReadOnly = true;
             this.textBox3.Size = new System.Drawing.Size(202, 20);
@@ -406,8 +415,10 @@ namespace LabMethodOptimize
             this.objectiveFunctionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.objectiveFunctionTable.Location = new System.Drawing.Point(195, 44);
             this.objectiveFunctionTable.Name = "objectiveFunctionTable";
-            this.objectiveFunctionTable.Size = new System.Drawing.Size(550, 83);
+            this.objectiveFunctionTable.RowTemplate.Height = 23;
+            this.objectiveFunctionTable.Size = new System.Drawing.Size(550, 45);
             this.objectiveFunctionTable.TabIndex = 10;
+            this.objectiveFunctionTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.objectiveFunctionTable_CellValueChanged);
             // 
             // tabPage2
             // 
@@ -418,7 +429,7 @@ namespace LabMethodOptimize
             this.tabPage2.Controls.Add(this.panel1);
             this.tabPage2.Controls.Add(this.SSTextAnswer);
             this.tabPage2.Controls.Add(this.ButtonSimplexStep);
-            this.tabPage2.Controls.Add(this.SolutionGridView);
+            this.tabPage2.Controls.Add(this.SSolutionTable);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -455,7 +466,6 @@ namespace LabMethodOptimize
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(26, 24);
             this.panel2.TabIndex = 4;
-            this.panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.panel2_Paint);
             // 
             // panel1
             // 
@@ -464,7 +474,6 @@ namespace LabMethodOptimize
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(26, 23);
             this.panel1.TabIndex = 3;
-            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // SSTextAnswer
             // 
@@ -479,6 +488,7 @@ namespace LabMethodOptimize
             // 
             // ButtonSimplexStep
             // 
+            this.ButtonSimplexStep.Enabled = false;
             this.ButtonSimplexStep.Location = new System.Drawing.Point(1002, 80);
             this.ButtonSimplexStep.Name = "ButtonSimplexStep";
             this.ButtonSimplexStep.Size = new System.Drawing.Size(211, 78);
@@ -487,135 +497,30 @@ namespace LabMethodOptimize
             this.ButtonSimplexStep.UseVisualStyleBackColor = true;
             this.ButtonSimplexStep.Click += new System.EventHandler(this.ButtonSimplexStep_Click);
             // 
-            // SolutionGridView
+            // SSolutionTable
             // 
-            this.SolutionGridView.AllowUserToAddRows = false;
-            this.SolutionGridView.AllowUserToDeleteRows = false;
-            this.SolutionGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.SolutionGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column1,
-            this.Column2,
-            this.Column3,
-            this.Column4,
-            this.Column5,
-            this.Column6,
-            this.Column7,
-            this.Column8,
-            this.Column9,
-            this.Column10,
-            this.Column11,
-            this.Column12,
-            this.Column13,
-            this.Column14,
-            this.Column15,
-            this.Column16});
-            this.SolutionGridView.Location = new System.Drawing.Point(8, 6);
-            this.SolutionGridView.Name = "SolutionGridView";
-            this.SolutionGridView.ReadOnly = true;
-            this.SolutionGridView.Size = new System.Drawing.Size(965, 429);
-            this.SolutionGridView.TabIndex = 0;
-            this.SolutionGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SolutionGridView_CellClick);
-            // 
-            // Column1
-            // 
-            this.Column1.HeaderText = "Column1";
-            this.Column1.Name = "Column1";
-            this.Column1.ReadOnly = true;
-            this.Column1.Width = 50;
-            // 
-            // Column2
-            // 
-            this.Column2.HeaderText = "Column2";
-            this.Column2.Name = "Column2";
-            this.Column2.ReadOnly = true;
-            // 
-            // Column3
-            // 
-            this.Column3.HeaderText = "Column3";
-            this.Column3.Name = "Column3";
-            this.Column3.ReadOnly = true;
-            // 
-            // Column4
-            // 
-            this.Column4.HeaderText = "Column4";
-            this.Column4.Name = "Column4";
-            this.Column4.ReadOnly = true;
-            // 
-            // Column5
-            // 
-            this.Column5.HeaderText = "Column5";
-            this.Column5.Name = "Column5";
-            this.Column5.ReadOnly = true;
-            // 
-            // Column6
-            // 
-            this.Column6.HeaderText = "Column6";
-            this.Column6.Name = "Column6";
-            this.Column6.ReadOnly = true;
-            // 
-            // Column7
-            // 
-            this.Column7.HeaderText = "Column7";
-            this.Column7.Name = "Column7";
-            this.Column7.ReadOnly = true;
-            // 
-            // Column8
-            // 
-            this.Column8.HeaderText = "Column8";
-            this.Column8.Name = "Column8";
-            this.Column8.ReadOnly = true;
-            // 
-            // Column9
-            // 
-            this.Column9.HeaderText = "Column9";
-            this.Column9.Name = "Column9";
-            this.Column9.ReadOnly = true;
-            // 
-            // Column10
-            // 
-            this.Column10.HeaderText = "Column10";
-            this.Column10.Name = "Column10";
-            this.Column10.ReadOnly = true;
-            // 
-            // Column11
-            // 
-            this.Column11.HeaderText = "Column11";
-            this.Column11.Name = "Column11";
-            this.Column11.ReadOnly = true;
-            // 
-            // Column12
-            // 
-            this.Column12.HeaderText = "Column12";
-            this.Column12.Name = "Column12";
-            this.Column12.ReadOnly = true;
-            // 
-            // Column13
-            // 
-            this.Column13.HeaderText = "Column13";
-            this.Column13.Name = "Column13";
-            this.Column13.ReadOnly = true;
-            // 
-            // Column14
-            // 
-            this.Column14.HeaderText = "Column14";
-            this.Column14.Name = "Column14";
-            this.Column14.ReadOnly = true;
-            // 
-            // Column15
-            // 
-            this.Column15.HeaderText = "Column15";
-            this.Column15.Name = "Column15";
-            this.Column15.ReadOnly = true;
-            // 
-            // Column16
-            // 
-            this.Column16.HeaderText = "Column16";
-            this.Column16.Name = "Column16";
-            this.Column16.ReadOnly = true;
+            this.SSolutionTable.AllowUserToAddRows = false;
+            this.SSolutionTable.AllowUserToDeleteRows = false;
+            this.SSolutionTable.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(229)))), ((int)(((byte)(238)))));
+            this.SSolutionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.SSolutionTable.GridColor = System.Drawing.SystemColors.ActiveBorder;
+            this.SSolutionTable.Location = new System.Drawing.Point(8, 6);
+            this.SSolutionTable.Name = "SSolutionTable";
+            this.SSolutionTable.ReadOnly = true;
+            this.SSolutionTable.Size = new System.Drawing.Size(965, 429);
+            this.SSolutionTable.TabIndex = 0;
+            this.SSolutionTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SolutionGridView_CellClick);
             // 
             // tabPage3
             // 
-            this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage3.BackColor = System.Drawing.Color.Ivory;
+            this.tabPage3.Controls.Add(this.textBox10);
+            this.tabPage3.Controls.Add(this.textBox11);
+            this.tabPage3.Controls.Add(this.panel3);
+            this.tabPage3.Controls.Add(this.panel4);
+            this.tabPage3.Controls.Add(this.ABAnswerText);
+            this.tabPage3.Controls.Add(this.ABStepButton);
+            this.tabPage3.Controls.Add(this.ABSolverTable);
             this.tabPage3.Location = new System.Drawing.Point(4, 24);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
@@ -625,7 +530,9 @@ namespace LabMethodOptimize
             // 
             // tabPage4
             // 
-            this.tabPage4.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage4.BackColor = System.Drawing.Color.Ivory;
+            this.tabPage4.Controls.Add(this.GAnswerText);
+            this.tabPage4.Controls.Add(this.GSSolutionTable);
             this.tabPage4.Location = new System.Drawing.Point(4, 24);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
@@ -633,16 +540,118 @@ namespace LabMethodOptimize
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Графический метод";
             // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            // 
             // openFileDialog
             // 
             this.openFileDialog.Filter = "Text files (*.txt)|*.txt";
+            // 
+            // textBox10
+            // 
+            this.textBox10.BackColor = System.Drawing.Color.Ivory;
+            this.textBox10.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.textBox10.Location = new System.Drawing.Point(205, 518);
+            this.textBox10.Name = "textBox10";
+            this.textBox10.ReadOnly = true;
+            this.textBox10.Size = new System.Drawing.Size(256, 24);
+            this.textBox10.TabIndex = 13;
+            this.textBox10.Text = "Выбранный опорный элемент";
+            // 
+            // textBox11
+            // 
+            this.textBox11.BackColor = System.Drawing.Color.Ivory;
+            this.textBox11.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.textBox11.Location = new System.Drawing.Point(205, 474);
+            this.textBox11.Name = "textBox11";
+            this.textBox11.ReadOnly = true;
+            this.textBox11.Size = new System.Drawing.Size(256, 24);
+            this.textBox11.TabIndex = 12;
+            this.textBox11.Text = "Возможный опорный элемент";
+            // 
+            // panel3
+            // 
+            this.panel3.BackColor = System.Drawing.Color.LightCoral;
+            this.panel3.Location = new System.Drawing.Point(173, 518);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(26, 24);
+            this.panel3.TabIndex = 11;
+            // 
+            // panel4
+            // 
+            this.panel4.BackColor = System.Drawing.Color.Aquamarine;
+            this.panel4.Location = new System.Drawing.Point(173, 475);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(26, 23);
+            this.panel4.TabIndex = 10;
+            // 
+            // ABAnswerText
+            // 
+            this.ABAnswerText.BackColor = System.Drawing.Color.OldLace;
+            this.ABAnswerText.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.ABAnswerText.Location = new System.Drawing.Point(776, 375);
+            this.ABAnswerText.Multiline = true;
+            this.ABAnswerText.Name = "ABAnswerText";
+            this.ABAnswerText.ReadOnly = true;
+            this.ABAnswerText.Size = new System.Drawing.Size(260, 60);
+            this.ABAnswerText.TabIndex = 9;
+            // 
+            // ABStepButton
+            // 
+            this.ABStepButton.Enabled = false;
+            this.ABStepButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.ABStepButton.Location = new System.Drawing.Point(776, 157);
+            this.ABStepButton.Name = "ABStepButton";
+            this.ABStepButton.Size = new System.Drawing.Size(211, 78);
+            this.ABStepButton.TabIndex = 8;
+            this.ABStepButton.Text = "Шаг";
+            this.ABStepButton.UseVisualStyleBackColor = true;
+            this.ABStepButton.Click += new System.EventHandler(this.ABStepButton_Click);
+            // 
+            // ABSolverTable
+            // 
+            this.ABSolverTable.AllowUserToAddRows = false;
+            this.ABSolverTable.AllowUserToDeleteRows = false;
+            this.ABSolverTable.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(229)))), ((int)(((byte)(238)))));
+            this.ABSolverTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ABSolverTable.GridColor = System.Drawing.SystemColors.ActiveBorder;
+            this.ABSolverTable.Location = new System.Drawing.Point(8, 6);
+            this.ABSolverTable.Name = "ABSolverTable";
+            this.ABSolverTable.ReadOnly = true;
+            this.ABSolverTable.Size = new System.Drawing.Size(750, 429);
+            this.ABSolverTable.TabIndex = 7;
+            // 
+            // GAnswerText
+            // 
+            this.GAnswerText.BackColor = System.Drawing.Color.OldLace;
+            this.GAnswerText.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.GAnswerText.Location = new System.Drawing.Point(394, 390);
+            this.GAnswerText.Multiline = true;
+            this.GAnswerText.Name = "GAnswerText";
+            this.GAnswerText.ReadOnly = true;
+            this.GAnswerText.Size = new System.Drawing.Size(260, 60);
+            this.GAnswerText.TabIndex = 12;
+            // 
+            // GSSolutionTable
+            // 
+            this.GSSolutionTable.AllowUserToAddRows = false;
+            this.GSSolutionTable.AllowUserToDeleteRows = false;
+            this.GSSolutionTable.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(229)))), ((int)(((byte)(238)))));
+            this.GSSolutionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.GSSolutionTable.GridColor = System.Drawing.SystemColors.ActiveBorder;
+            this.GSSolutionTable.Location = new System.Drawing.Point(8, 6);
+            this.GSSolutionTable.Name = "GSSolutionTable";
+            this.GSSolutionTable.ReadOnly = true;
+            this.GSSolutionTable.Size = new System.Drawing.Size(646, 378);
+            this.GSSolutionTable.TabIndex = 10;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Ivory;
-            this.ClientSize = new System.Drawing.Size(1838, 831);
+            this.ClientSize = new System.Drawing.Size(1410, 831);
             this.Controls.Add(this.MainMenu);
             this.Controls.Add(this.tabControl);
             this.MainMenuStrip = this.MainMenu;
@@ -662,7 +671,13 @@ namespace LabMethodOptimize
             ((System.ComponentModel.ISupportInitialize)(this.objectiveFunctionTable)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SolutionGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SSolutionTable)).EndInit();
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ABSolverTable)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.GSSolutionTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -689,23 +704,7 @@ namespace LabMethodOptimize
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.DataGridView SolutionGridView;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column8;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column9;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column10;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column11;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column12;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column13;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column14;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column15;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column16;
+        private System.Windows.Forms.DataGridView SSolutionTable;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.TextBox textBox6;
         private System.Windows.Forms.DataGridView basicVariablesTable;
@@ -714,9 +713,9 @@ namespace LabMethodOptimize
         private System.Windows.Forms.ComboBox fractionType;
         private System.Windows.Forms.TextBox textBox8;
         private System.Windows.Forms.GroupBox groupBoxMethod;
-        private System.Windows.Forms.RadioButton radioButton3;
-        private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton RBGraphic;
+        private System.Windows.Forms.RadioButton RBArtificial;
+        private System.Windows.Forms.RadioButton RBSimplexMethod;
         private System.Windows.Forms.Button BeginSolve;
         private System.Windows.Forms.Button ButtonSimplexStep;
         private System.Windows.Forms.TextBox SSTextAnswer;
@@ -724,6 +723,15 @@ namespace LabMethodOptimize
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TextBox textBox10;
+        private System.Windows.Forms.TextBox textBox11;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.TextBox ABAnswerText;
+        private System.Windows.Forms.Button ABStepButton;
+        private System.Windows.Forms.DataGridView ABSolverTable;
+        private System.Windows.Forms.TextBox GAnswerText;
+        private System.Windows.Forms.DataGridView GSSolutionTable;
     }
 }
 

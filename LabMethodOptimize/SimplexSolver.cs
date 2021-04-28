@@ -47,7 +47,7 @@ namespace SimplexSolverClass
          * Заполняет симплекс таблицу из таблицы гаусса 
          * Можно считать это корректной инициилазцией объекта и началом работы с самой симплекс таблицей
          */
-        public void FillTable(GaussMatrix gaussM, DataGridViewRow initObjFunc, bool fFindMax)
+        public void FillTable(GaussMatrix gaussM, List<Fraction> initObjFunc, bool fFindMax)
         {
             ILBasisEl = new List<int>(gaussM.IndexListBasisElements);
 
@@ -69,26 +69,26 @@ namespace SimplexSolverClass
             CalculateObjectiveFunctionValue(initObjFunc, fFindMax);
         }
 
-        private void CalculateObjectiveFunction(DataGridViewRow initObjFunc, bool fFindMax)
+        private void CalculateObjectiveFunction(List<Fraction> initObjFunc, bool fFindMax)
         {
             for (int i = 0; i < ColumCount; i++)
             {
                 Fraction Result = new Fraction(0);
                 for (int g = 0; g < RowCount; g++)
                 {
-                    Result += (-Matrix[g][i]) * (new Fraction(initObjFunc.Cells[ILBasisEl[g]].Value.ToString()));
+                    Result += (-Matrix[g][i]) * initObjFunc[ILBasisEl[g]];
                 }
 
-                if (fFindMax) ObjFuncion[i] = -(Result + (new Fraction(initObjFunc.Cells[ILFreeEl[i]].Value.ToString())));
-                else ObjFuncion[i] = Result + (new Fraction(initObjFunc.Cells[ILFreeEl[i]].Value.ToString()));
+                if (fFindMax) ObjFuncion[i] = -(Result + initObjFunc[ILFreeEl[i]]);//TODO FREE EL !!!!!!!!!!!!!!!!!!!!!
+                else ObjFuncion[i] = Result + initObjFunc[ILFreeEl[i]];
             }
         }
-        private void CalculateObjectiveFunctionValue(DataGridViewRow initObjFunc, bool fFindMax)
+        private void CalculateObjectiveFunctionValue(List<Fraction> initObjFunc, bool fFindMax)
         {
             Fraction Result = new Fraction(0);
             for (int i = 0; i < RowCount; i++)
             {
-                Result += RightPart[i] * (new Fraction(initObjFunc.Cells[ILBasisEl[i]].Value.ToString()));
+                Result += RightPart[i] * initObjFunc[ILBasisEl[i]];
             }
 
             if (fFindMax) OFV = Result;
@@ -249,6 +249,42 @@ namespace SimplexSolverClass
             }
             return optimalIndex;
         }
+
+        public void DeleteExtraVariblsFromAB(int numFromDelete)
+        {
+            int indexToDelete = ILFreeEl.FindIndex(x => x > numFromDelete);
+            if (indexToDelete < 0)
+                return;
+            //Теперь необходимо сместить все индесы на еденицу начиная с того, который удаляем. 
+            //Чтобы в дальнейшем не возникло проблем с размерностью, будем использовать переопределение этих самых матриц
+            //Тогда нам нужно заменить лишь Matrix & ObjFunction
+            Fraction[] NewObjFunction = new Fraction[ColumCount - 1];//Понижаем размерность
+            Fraction[][] NewMatrix = new Fraction[RowCount][];
+            for (int i = 0; i < RowCount; i++)
+                NewMatrix[i] = new Fraction[ColumCount-1];
+
+            int offset = 0;
+            for (int g = 0; g < ColumCount; g++)
+            {
+                if (g == indexToDelete)
+                {
+                    offset = 1;
+                    continue;
+                }
+                for (int i = 0; i < RowCount; i++)
+                {
+                    NewMatrix[i][g - offset] = Matrix[i][g];
+                }
+                NewObjFunction[g - offset] = ObjFuncion[g];
+            }
+
+            ColumCount--;
+            ILFreeEl.RemoveAt(indexToDelete);
+            Matrix = NewMatrix;
+            ObjFuncion = NewObjFunction;
+
+        }
+
         public int SimplexStep()
         {
             if (bearingEls.Count == 0)
@@ -258,6 +294,21 @@ namespace SimplexSolverClass
             SimplexStepWithCurrentEl(FindOptimalBearingElement());
 
             return 0; //Всё успешно.
+        }
+
+        public void GetRidOfNegativeLines()
+        {
+            for (int i = 0; i < RowCount; i++)
+            {
+                if (RightPart[i] < 0)
+                {
+                    for (int g = 0; g < ColumCount; g++)
+                    {
+                        Matrix[i][g] *= -1;
+                    }
+                    RightPart[i] *= -1;
+                }
+            }
         }
     }
 }
