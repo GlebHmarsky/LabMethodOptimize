@@ -21,7 +21,7 @@ namespace LabMethodOptimize
         /*-------------------     GLOBAL VAR      -----------------*/
         //GaussMatrix GaussMat;
         uint RowCount, ColumCount;
-        int StartRowForSSolutionGrid = 0;
+        int StartRowForAnswerTable = 0;
         SimplexSolver SSolver;
         int pivotIndex;
 
@@ -48,11 +48,15 @@ namespace LabMethodOptimize
             basicVariablesTable.RowHeadersVisible = false;
             SSolutionTable.RowHeadersVisible = false;
             ABSolverTable.RowHeadersVisible = false;
-            //TODO Добавить сюда инициализацию таблицы решения и её многих столбцов.
+            GSSolutionTable.RowHeadersVisible = false;
+
             for (int g = 0; g < 18; g++)
             {
                 SSolutionTable.Columns.Add(g.ToString(), "");
                 SSolutionTable.Columns[g].Width = 60;
+
+                GSSolutionTable.Columns.Add(g.ToString(), "");
+                GSSolutionTable.Columns[g].Width = 60;
             }
             for (int g = 0; g < 34; g++)
             {
@@ -60,10 +64,14 @@ namespace LabMethodOptimize
                 ABSolverTable.Columns[g].Width = 60;
             }
 
+
         }
         // План на день ;)
-        //  TODO необходимо пофиксить окраску и выбор элементов для каждого метода по отдельности
-        // TODO  и разумеется доделать по нормальному иск. базис
+        // BUG необходимо пофиксить окраску и выбор элементов для каждого метода по отдельности
+        // BUG  и разумеется доделать по нормальному иск. базис
+
+        // TODO добвить проверку что строки функции и базиса заполнены(!) Формат можно не проверять, на это будем ругаться после.
+        // Главное чтоб были для двух методов сделана проверка
         private void numericUpDownColumn_ValueChanged(object sender, EventArgs e)
         {
             if (restrictionTable.Columns.Count < 1)
@@ -120,6 +128,10 @@ namespace LabMethodOptimize
         }
         private void numericUpDownRow_ValueChanged(object sender, EventArgs e)
         {
+            if (numericUpDownRow.Value > numericUpDownColumn.Value)
+            {
+                numericUpDownRow.Value = numericUpDownColumn.Value;
+            }
             if (restrictionTable.Columns.Count == 0)
             {
                 numericUpDownRow.Value = 0;
@@ -158,6 +170,8 @@ namespace LabMethodOptimize
         }
 
 
+        /*-------------------------------      MENU     ------------------------------*/
+
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -166,7 +180,7 @@ namespace LabMethodOptimize
             {
 
                 tabControl.SelectTab(tabPage1);
-                //TODO При открытии файла очищать список базисных переменных
+
                 if (basicVariablesTable.Rows.Count != 0)
                 {
                     foreach (DataGridViewCell cell in basicVariablesTable.Rows[0].Cells)
@@ -215,7 +229,7 @@ namespace LabMethodOptimize
                         numericUpDownRow.Value = RowCount;
 
                         str = sr.ReadLine().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        if (str.Length != ColumCount) //TODO ВОзможно тут надо будет добавить +1 т.к. не ясно может ли у целевой функции быть константа
+                        if (str.Length != ColumCount) //REM ВОзможно тут надо будет добавить +1 т.к. не ясно может ли у целевой функции быть константа
                         {
                             throw new DataReadException("Ошибка в указании количества переменных целевой функции\n" +
                                 $"Их: {str.Length}\nДолжно быть: {ColumCount}");
@@ -262,12 +276,16 @@ namespace LabMethodOptimize
             }
         }
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
+        {            
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
+                numericUpDownColumn.Focus();//Это для того чтобы снять выделение с элемента таблицы чтобы он записался и сохранился там
+                //после уже само сохранение всей таблицы
                 StreamWriter st;
                 if ((st = new StreamWriter(Path.GetFullPath(saveFileDialog.FileName))) != null)
                 {
+                    RowCount = (uint)numericUpDownRow.Value;
+                    ColumCount = (uint)numericUpDownColumn.Value;
                     st.Write(optimizationProblem.SelectedIndex.ToString());
                     st.Write("\r\n" + numericUpDownRow.Value.ToString() + " " + numericUpDownColumn.Value.ToString());
                     st.Write("\r\n");
@@ -289,6 +307,18 @@ namespace LabMethodOptimize
                 }
             }
         }
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //ADD окно которое будет выводить информацию о программе
+            //возможно с картинками ;)
+
+            var window = new Form(); // Help being the help window class
+            window.Show();
+        }
+
+
+        /*-------------------------------      WORK WITH ALL 3 METHODS     ------------------------------*/
+
 
         private int SetIndexListBasisElementsFromTable(GaussMatrix GaussMat)
         {
@@ -312,29 +342,33 @@ namespace LabMethodOptimize
                     else
                     {
                         BeginSolve.Enabled = false;
-                        throw new DataReadException("Элемент начального базиса выходит за границы количества переменных задачи или не вовсе не задан");
+                        throw new DataReadException("Элемент начального базиса не задан или выходит за границы количества переменных задачи");
                     }
                 }
             }
             catch (DataReadException exp)
             {
-                MessageBox.Show($"Data Read error.\n\nError message: Плохой формат ввода данных\n{exp.Message}\n\n");
+                MessageBox.Show($"Data Read error.\n\nПлохой формат ввода данных\n{exp.Message}\n\n");
+                tabControl.SelectTab(tabPage1);
                 return 1;
             }
             catch (FractionException exp)
             {
                 MessageBox.Show($"Format Fraction error.\n\nError message: {exp.Message}\n\n");
+                tabControl.SelectTab(tabPage1);
                 return 1;
             }
             catch (FormatException exp)
             {
-                MessageBox.Show($"Error message: {exp.Message}\n\n" /*+ $"Details:\n\n{exp.StackTrace}"*/, "Format error");
+                MessageBox.Show($"Format error.\n\nError message: {exp.Message}");
+                tabControl.SelectTab(tabPage1);
                 return 1;
             }
             catch (Exception exp)
             {
                 MessageBox.Show($"Security error.\n\nError message: {exp.Message}\n\n" +
                 $"Details:\n\n{exp.StackTrace}");
+                tabControl.SelectTab(tabPage1);
                 return 1;
             }
             return 0;
@@ -355,7 +389,7 @@ namespace LabMethodOptimize
             }
             catch (DataReadException exp)
             {
-                MessageBox.Show($"Data Read error.\n\nError message: Плохой формат ввода данных\n{exp.Message}\n\n");
+                MessageBox.Show($"Data Read error.\n\nПлохой формат ввода данных\n{exp.Message}\n\n");
                 return null;
             }
             catch (FractionException exp)
@@ -365,7 +399,7 @@ namespace LabMethodOptimize
             }
             catch (FormatException exp)
             {
-                MessageBox.Show($"Error message: {exp.Message}\n\n" /*+ $"Details:\n\n{exp.StackTrace}"*/, "Format error");
+                MessageBox.Show($"Format error.\n\nError message: {exp.Message}");
                 return null;
             }
             catch (Exception exp)
@@ -379,7 +413,6 @@ namespace LabMethodOptimize
         }
         private void BeginSolve_Click(object sender, EventArgs e)
         {
-            // TODO Вызывает хороший метод из Simplex Solver и других штучек в соответсвии с выбранным решением задачи.
 
             //TODO сделать проверку, что если число ограничений больше переменных, то бросать дело и требовать испраления
             //Однако у нас же в графическом методе бывает куча ограничений, как быть с ними?
@@ -390,35 +423,51 @@ namespace LabMethodOptimize
              * 2Д и 3Д объект отрисовываться. 
              * 
              * Вспомная ту домашку с 2 переменными и миллардом ограничений мы можем составить "изначальную" задачу. 
-             * Та, из которой мы пришли к этой. В ней будет на 2 переменных больше чем ограничений в этой и соответсвенно она будет выглядеть странно,
+             * Та, из которой мы пришли к этой. В ней будет на 2 переменных больше чем ограничений в этой и соответсвенно она будет выглядеть готовой,
              * т.к. она будет уже приведена гауссом ( в каждой строке 1 и остальное 0, кроме 1ой и 2ой переменных) 
              * 
              * Так что бьём по попе пользователя если тот удумает запускать графический метод с неправильным количеством переменных
              */
-            // TODO при нажатии нового решения старое бы хорошо полностью отчистить в том окне, в котором собираемся решать задачу.
-            StartRowForSSolutionGrid = 0;
-            ButtonSimplexStep.Enabled = true;//TODO Допускать кнопки к рабочему состоянию только по if else блоку
-            ABStepButton.Enabled = true;
 
-            SSolutionTable.Rows.Clear();
-            SSolutionTable.Refresh();
+            // TODO:  Не допускать решение когда не прописаны базисные переменные
+            StartRowForAnswerTable = 0;
+
 
             //TODO Не помешали бы провеки на эти самые переменные прямо тут ;)
             RowCount = (uint)numericUpDownRow.Value;
             ColumCount = (uint)numericUpDownColumn.Value;
-
+            if (RowCount > ColumCount)
+            {
+                //ругаемся и выходим сразу же
+                //для графического будет повторная проверка чтоб было ограничений на 2 меньше
+                MessageBox.Show("Получил ошибку при решении метода Гаусса\n\n" +
+                    "Система не имеет решений и дальнейшая работа остановлена");
+                ButtonSimplexStep.Enabled = false;
+                return;
+            }
             GaussMatrix GaussMat = new GaussMatrix(RowCount, ColumCount);
             SSolver = new SimplexSolver(RowCount, ColumCount - RowCount);
 
             if (RBSimplexMethod.Checked) // Симплекс
             {
+                SSolutionTable.Rows.Clear();
+                SSolutionTable.Refresh();
+                ButtonSimplexStep.Enabled = true;
+
                 tabControl.SelectTab(tabPage2);
+
                 if ((GaussMat = FillTheGaussMatFromTable(GaussMat)) == null) return;
                 if (SetIndexListBasisElementsFromTable(GaussMat) > 0) return;
             }
             else if (RBArtificial.Checked) // Искуственный
             {
+
+                ABSolverTable.Rows.Clear();
+                ABAnswerText.Text = "";
+                ABStepButton.Enabled = true;
+
                 tabControl.SelectTab(tabPage3);
+
                 GaussMat = new GaussMatrix(RowCount, ColumCount + RowCount);
                 SSolver = new SimplexSolver(RowCount, ColumCount);
 
@@ -442,6 +491,12 @@ namespace LabMethodOptimize
             }
             else if (RBGraphic.Checked) // Графика
             {
+                if (RowCount > ColumCount - 2)
+                {
+                    MessageBox.Show("Плохое количество граничных условий\n\nОно больше чем количество переменных");
+                    tabControl.SelectTab(tabPage1);
+                    return;
+                }
                 tabControl.SelectTab(tabPage4);
                 if ((GaussMat = FillTheGaussMatFromTable(GaussMat)) == null) return;
                 if (SetIndexListBasisElementsFromTable(GaussMat) > 0) return;
@@ -450,12 +505,17 @@ namespace LabMethodOptimize
             GaussMat.IndexListBasisElements.Sort();
             if (GaussMat.SolveMatrix() == 1)
             {
-                MessageBox.Show("Получил ошибку при решении метода гаусса!");
+                MessageBox.Show("Получил ошибку при решении метода Гаусса\n\n" +
+                    "Система не имеет решений и дальнейшая работа остановлена");
+                //TODO при графическом методе можно что-нибудь блокировать.
                 tabControl.SelectTab(tabPage1);
                 return;
             }
 
+
             /*-----------------------       SimplexSolver       -----------------------*/
+
+
             List<Fraction> objectiveFunctionArr = new List<Fraction>();
             try
             {
@@ -469,9 +529,10 @@ namespace LabMethodOptimize
                     {
                         objectiveFunctionArr.Add(new Fraction(1));
                     }
-                    SSolver.FillTable(GaussMat, objectiveFunctionArr, false);//TODO проследить за тем, что минимум и максимум парвильно работают
+                    SSolver.FillTable(GaussMat, objectiveFunctionArr, false);
+                    SSolver.isArtificialTask = true;
                 }
-                else
+                else // Симплекс
                 {
                     foreach (DataGridViewCell cell in objectiveFunctionTable.Rows[0].Cells)
                     {
@@ -481,6 +542,11 @@ namespace LabMethodOptimize
                     SSolver.FillTable(GaussMat, objectiveFunctionArr, optimizationProblem.SelectedIndex == 1);
                 }
 
+            }
+            catch (NullReferenceException exp)
+            {
+                MessageBox.Show($"Какие ужасные аргументы задачи боже мой: {exp.Message}\n\n");
+                return;
             }
             catch (FractionException exp)
             {
@@ -525,7 +591,7 @@ namespace LabMethodOptimize
             if (SSolver.bearingEls.Count == 0) return;
             Update();
             int iRow, iColum;
-            int StartRowOfCurTable = StartRowForSSolutionGrid - 2 - (int)SSolver.RowCount;
+            int StartRowOfCurTable = StartRowForAnswerTable - 2 - (int)SSolver.RowCount;
             for (int i = 0; i < SSolver.bearingEls.Count; i++)
             {
                 iRow = SSolver.bearingEls[i][0];
@@ -554,7 +620,6 @@ namespace LabMethodOptimize
             */
             if (returnResult > 0)
             {
-                ButtonSimplexStep.Enabled = false;
 
                 if (returnResult == 1)
                 {
@@ -596,12 +661,13 @@ namespace LabMethodOptimize
         }
         private void ButtonSimplexStep_Click(object sender, EventArgs e)
         {
-            SSolver.SimplexStepWithCurrentEl(pivotIndex); //TODO может тоже потребуется ловить возващаемое значение для проверки
+            SSolver.SimplexStepWithCurrentEl(pivotIndex); //REM может тоже потребуется ловить возващаемое значение для проверки
             PrintResultToSoulutionGridView(SSolutionTable, SSolver);
             string str;
             if ((str = FindAndCheckBearingElements()).Length > 0)
             {
                 SSTextAnswer.Text = str;
+                ButtonSimplexStep.Enabled = false;
             }
             if ((pivotIndex = SSolver.FindOptimalBearingElement()) < 0)
             {
@@ -613,18 +679,129 @@ namespace LabMethodOptimize
         }
         private void ABStepButton_Click(object sender, EventArgs e)
         {
-            SSolver.SimplexStepWithCurrentEl(pivotIndex); //TODO может тоже потребуется ловить возващаемое значение для проверки
-            SSolver.DeleteExtraVariblsFromAB((int)ColumCount);
+            SSolver.SimplexStepWithCurrentEl(pivotIndex); //REM может тоже потребуется ловить возващаемое значение для проверки
+            if (SSolver.isArtificialTask) SSolver.DeleteExtraVariblsFromAB((int)ColumCount - 1);
             PrintResultToSoulutionGridView(ABSolverTable, SSolver);
             string str;
             if ((str = FindAndCheckBearingElements()).Length > 0)
             {
-                ABAnswerText.Text = str;
+                if (!SSolver.isArtificialTask)
+                    ABAnswerText.Text = str;
             }
             if ((pivotIndex = SSolver.FindOptimalBearingElement()) < 0)
             {
-                //Нету элементов и надо выходить
-                return;
+                //Нету элементов и надо проверить что это вспомогательная задача тогда продолжать решение.
+                if (!(SSolver.isArtificialTask))
+                {
+                    ABStepButton.Enabled = false;
+                    return;
+                }
+
+                /* 
+                 * Тогда вспомогательная задача "решена" и надо удостовериться что все базисные переменные выведены
+                 *                 
+                 * Могут быть следующие развития событий
+                 * >У нас система несовместна - не удаётся вывести переменную 
+                 * >Зависимы - когда вся строка элементов = 0
+                 * >Необходим холостой шаг т.е. целевая функция = 0 а не все переменные выведены 
+                 * тогда находим ненулевой элемент в строке с вспомогательной  переменной и выводим её обычным шагом
+                 * (на этом же поиске будет определяться Зависимость матрицы)
+                 * 
+                 * Придётся дополнительно искуственно заполнять список возможных опорных элементов
+                 */
+                for (int i = 0; i < RowCount; i++)
+                {
+                    if (SSolver.ILBasisEl[i]>ColumCount-1)//Есть вспомогательный элемент в строке i
+                    {
+                        //тогда запиши все ненулевые убедись что справа 0
+                        if (SSolver.RightPart[i] != 0)//Справа не ноль
+                        {
+                            //Рагуемся что у нас несовместны граничные условия задачи
+                            ABAnswerText.Text = "Система ограничений несовместна\n\nНет решений!";
+                            //MessageBox.Show("Система ограничений несовместна\n\nНет решений!");
+                            ABStepButton.Enabled = false;
+                            return;
+                        }
+                        //иначе искать ненулевые элементы в каждой строке.
+                        //Причём, если в строке не нашлось элементов - сигнал к тому что у нас система зависима и надо ругаться.
+
+                        //Для того чтобы определять зависимость строк - будем использовать флаг
+                        bool fHaveDependentLines = false;
+                        for (int g = 0; g < SSolver.ColumCount; g++)
+                        {
+                            if (SSolver.Matrix[i][g]!=0)
+                            {
+                                fHaveDependentLines = false;
+                                SSolver.bearingEls.Add(new int[2] { i, g });
+                            }
+                        }
+                        if (fHaveDependentLines)//Проверяем флаг
+                        {
+                            //ругаемся
+                            ABAnswerText.Text = "Система ограничений зависима";
+                            //MessageBox.Show("Система ограничений зависима\n\nНеобходимо выкинуть зависимые строки и можете попробовать ещё раз");
+                            ABStepButton.Enabled = false;
+                            return;
+                        }
+                        //иначе есть переменные по которым будем ща скакать
+                        //но сначала нужно найти индекс и предоставить пользователю выбирать
+                        if ((pivotIndex = SSolver.FindOptimalBearingElement()) < 0) //Конкретно тут проверка откровенно лишняя, т.к. опорные точно есть, но пусть будет
+                        {
+                            //Нету элементов и надо проверить что это вспомогательная задача тогда продолжать решение.
+                            if (!SSolver.isArtificialTask)
+                            {
+                                ABStepButton.Enabled = false;
+                                return;
+                            }
+                        }
+                        ColorTheBearingEletemts(ABSolverTable);
+                        return; //Теперь пользователь может выбрать элемент и сделать холостой шаг
+                    }
+                }
+                SSolver.isArtificialTask = false;
+                List<Fraction> objectiveFunctionArr = new List<Fraction>();
+                try
+                {
+                    foreach (DataGridViewCell cell in objectiveFunctionTable.Rows[0].Cells)
+                    {
+                        objectiveFunctionArr.Add(new Fraction(cell.Value.ToString()));
+                    }
+
+                    SSolver.CalculateObjectiveFunction(objectiveFunctionArr, optimizationProblem.SelectedIndex == 1);
+                    SSolver.CalculateObjectiveFunctionValue(objectiveFunctionArr, optimizationProblem.SelectedIndex == 1);
+
+                }
+                catch (FractionException exp)
+                {
+                    MessageBox.Show($"Format Fraction error.\n\nError message: {exp.Message}\n\n");
+                    ABStepButton.Enabled = false;
+                    return;
+                }
+                catch (Exception exp)
+                {
+                    MessageBox.Show($"Security error.\n\nError message: {exp.Message}\n\n" +
+                    $"Details:\n\n{exp.StackTrace}");
+                    ABStepButton.Enabled = false;
+                    return;
+                }
+
+
+                if ((str = FindAndCheckBearingElements()).Length > 0)
+                {
+                    if (!SSolver.isArtificialTask)
+                        ABAnswerText.Text = str;
+                }
+                if ((pivotIndex = SSolver.FindOptimalBearingElement()) < 0)
+                {
+                    //Нету элементов и надо проверить что это вспомогательная задача тогда продолжать решение.
+                    if (!SSolver.isArtificialTask)
+                    {
+                        ABStepButton.Enabled = false;
+                        return;
+                    }
+                }
+                SSolver.iteration = 0;
+                PrintResultToSoulutionGridView(ABSolverTable, SSolver);
             }
             ColorTheBearingEletemts(ABSolverTable);
         }
@@ -647,14 +824,13 @@ namespace LabMethodOptimize
             {
                 return;
             }
-            int StartRowOfCurTable = StartRowForSSolutionGrid - 2 - (int)SSolver.RowCount;
+            int StartRowOfCurTable = StartRowForAnswerTable - 2 - (int)SSolver.RowCount;
             int[] tmpArr = new int[2] { e.RowIndex - StartRowOfCurTable, e.ColumnIndex - 1 };
             //bool res = SSolver.bearingEls.Exists(x => (x[0] == tmpArr[0] && x[1] == tmpArr[1]));
             //bool res = SSolver.bearingEls.Contains(tmpArr);
 
             int coolIndex;
-            coolIndex = BearingElsIndexOf(tmpArr);
-            //coolIndex = SSolver.bearingEls.IndexOf(tmpArr); // TODO Проверить ещё раз почему indexOf не работал
+            coolIndex = BearingElsIndexOf(tmpArr); //Обычный indexOf не работает для массивов
             if (coolIndex >= 0 && coolIndex != pivotIndex)
             {
                 SSolutionTable[SSolver.bearingEls[pivotIndex][1] + 1, SSolver.bearingEls[pivotIndex][0] + StartRowOfCurTable].Style = AquamarineStyle;
@@ -663,12 +839,30 @@ namespace LabMethodOptimize
             }
             //Иначе Пользователь клацнул не туда, так что ничего не делаем
         }
+        private void ABSolverTable_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (SSolver == null)
+            {
+                return;
+            }
+            int StartRowOfCurTable = StartRowForAnswerTable - 2 - (int)SSolver.RowCount;
+            int[] tmpArr = new int[2] { e.RowIndex - StartRowOfCurTable, e.ColumnIndex - 1 };
 
+            int coolIndex;
+            coolIndex = BearingElsIndexOf(tmpArr); //Обычный indexOf не работает для массивов      
+            if (coolIndex >= 0 && coolIndex != pivotIndex)
+            {
+                ABSolverTable[SSolver.bearingEls[pivotIndex][1] + 1, SSolver.bearingEls[pivotIndex][0] + StartRowOfCurTable].Style = AquamarineStyle;
+                pivotIndex = coolIndex;
+                ABSolverTable[SSolver.bearingEls[pivotIndex][1] + 1, SSolver.bearingEls[pivotIndex][0] + StartRowOfCurTable].Style = LightCoralStyle;
+            }
+            //Иначе Пользователь клацнул не туда, так что ничего не делаем
+        }
         private void PrintResultToSoulutionGridView(DataGridView SSolutionTable, SimplexSolver SSolver)
         {
             //TODO Сделать проверку что если новая таблица вылетает за границы то перетаскивать скролл ниже 
             //SolutionGridView.FirstDisplayedScrollingRowIndex = StartRowForSolutionGrid;
-            int countOfAddingRows = ((int)SSolver.RowCount + 2) + StartRowForSSolutionGrid - SSolutionTable.Rows.Count;
+            int countOfAddingRows = ((int)SSolver.RowCount + 2) + StartRowForAnswerTable - SSolutionTable.Rows.Count;
             if (countOfAddingRows > 0)
             {
                 SSolutionTable.Rows.Add(countOfAddingRows);
@@ -676,33 +870,33 @@ namespace LabMethodOptimize
             //Update();
 
             int i, g;
-            SSolutionTable[0, StartRowForSSolutionGrid].Value = "X (" + SSolver.iteration.ToString() + ")";
+            SSolutionTable[0, StartRowForAnswerTable].Value = "X (" + SSolver.iteration.ToString() + ")";
 
             for (i = 0; i < SSolver.ColumCount; i++)
             {
-                SSolutionTable[i + 1, StartRowForSSolutionGrid].Value = "X" + (SSolver.ILFreeEl[i] + 1).ToString();
+                SSolutionTable[i + 1, StartRowForAnswerTable].Value = "X" + (SSolver.ILFreeEl[i] + 1).ToString();
             }
 
-            StartRowForSSolutionGrid++;
+            StartRowForAnswerTable++;
 
             for (i = 0; i < SSolver.RowCount; i++)
             {
-                SSolutionTable[0, i + StartRowForSSolutionGrid].Value = "X" + (SSolver.ILBasisEl[i] + 1).ToString();
+                SSolutionTable[0, i + StartRowForAnswerTable].Value = "X" + (SSolver.ILBasisEl[i] + 1).ToString();
                 for (g = 0; g < SSolver.ColumCount; g++)
                 {
-                    SSolutionTable[g + 1, i + StartRowForSSolutionGrid].Value = SSolver.Matrix[i][g].ToString();
+                    SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = SSolver.Matrix[i][g].ToString();
                 }
-                SSolutionTable[g + 1, i + StartRowForSSolutionGrid].Value = SSolver.RightPart[i].ToString();
+                SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = SSolver.RightPart[i].ToString();
             }
 
 
             for (g = 0; g < SSolver.ColumCount; g++)
             {
-                SSolutionTable[g + 1, i + StartRowForSSolutionGrid].Value = SSolver.ObjFuncion[g].ToString();
+                SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = SSolver.ObjFuncion[g].ToString();
             }
-            SSolutionTable[g + 1, i + StartRowForSSolutionGrid].Value = SSolver.OFV.ToString();
+            SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = SSolver.OFV.ToString();
 
-            StartRowForSSolutionGrid += i + 2;
+            StartRowForAnswerTable += i + 2;
             //SolutionGridView[0, StartRowForSolutionGrid].Value = "u here!";
         }
 
@@ -744,6 +938,7 @@ namespace LabMethodOptimize
             textBox6.Visible = true;
             basicVariablesTable.Visible = true;
         }
+
         private void MainMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
 
@@ -755,22 +950,10 @@ namespace LabMethodOptimize
         }
 
 
-
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-
-
-
-
         private void fractionType_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
-
-
 
         private void optimizationProblem_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -781,7 +964,6 @@ namespace LabMethodOptimize
     }
 
 
-    // TODO:  Не допускать решение когда не прописаны базисные переменные для графического метода.
     class DataReadException : Exception
     {
         public DataReadException(string message)

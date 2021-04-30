@@ -64,9 +64,6 @@ namespace LabMethodOptimize
             this.ButtonSimplexStep = new System.Windows.Forms.Button();
             this.SSolutionTable = new System.Windows.Forms.DataGridView();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.textBox10 = new System.Windows.Forms.TextBox();
             this.textBox11 = new System.Windows.Forms.TextBox();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -74,8 +71,11 @@ namespace LabMethodOptimize
             this.ABAnswerText = new System.Windows.Forms.TextBox();
             this.ABStepButton = new System.Windows.Forms.Button();
             this.ABSolverTable = new System.Windows.Forms.DataGridView();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
             this.GAnswerText = new System.Windows.Forms.TextBox();
             this.GSSolutionTable = new System.Windows.Forms.DataGridView();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.restrictionTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownColumn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRow)).BeginInit();
@@ -88,8 +88,8 @@ namespace LabMethodOptimize
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SSolutionTable)).BeginInit();
             this.tabPage3.SuspendLayout();
-            this.tabPage4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ABSolverTable)).BeginInit();
+            this.tabPage4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GSSolutionTable)).BeginInit();
             this.SuspendLayout();
             // 
@@ -101,7 +101,7 @@ namespace LabMethodOptimize
             this.restrictionTable.AllowUserToResizeRows = false;
             this.restrictionTable.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(229)))), ((int)(((byte)(238)))));
             this.restrictionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.restrictionTable.Location = new System.Drawing.Point(195, 155);
+            this.restrictionTable.Location = new System.Drawing.Point(195, 111);
             this.restrictionTable.Name = "restrictionTable";
             this.restrictionTable.RowHeadersWidth = 80;
             this.restrictionTable.Size = new System.Drawing.Size(550, 344);
@@ -113,7 +113,7 @@ namespace LabMethodOptimize
             this.textBox1.BackColor = System.Drawing.Color.Ivory;
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox1.Location = new System.Drawing.Point(18, 88);
+            this.textBox1.Location = new System.Drawing.Point(18, 92);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.Size = new System.Drawing.Size(130, 14);
@@ -125,7 +125,7 @@ namespace LabMethodOptimize
             this.textBox2.BackColor = System.Drawing.Color.Ivory;
             this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox2.Location = new System.Drawing.Point(18, 25);
+            this.textBox2.Location = new System.Drawing.Point(18, 29);
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
             this.textBox2.Size = new System.Drawing.Size(130, 14);
@@ -134,7 +134,7 @@ namespace LabMethodOptimize
             // 
             // numericUpDownColumn
             // 
-            this.numericUpDownColumn.Location = new System.Drawing.Point(18, 44);
+            this.numericUpDownColumn.Location = new System.Drawing.Point(18, 48);
             this.numericUpDownColumn.Maximum = new decimal(new int[] {
             16,
             0,
@@ -147,7 +147,7 @@ namespace LabMethodOptimize
             // 
             // numericUpDownRow
             // 
-            this.numericUpDownRow.Location = new System.Drawing.Point(18, 107);
+            this.numericUpDownRow.Location = new System.Drawing.Point(18, 111);
             this.numericUpDownRow.Maximum = new decimal(new int[] {
             16,
             0,
@@ -184,14 +184,14 @@ namespace LabMethodOptimize
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -246,7 +246,7 @@ namespace LabMethodOptimize
             // 
             this.BeginSolve.BackColor = System.Drawing.Color.YellowGreen;
             this.BeginSolve.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.BeginSolve.Location = new System.Drawing.Point(35, 479);
+            this.BeginSolve.Location = new System.Drawing.Point(35, 483);
             this.BeginSolve.Name = "BeginSolve";
             this.BeginSolve.Size = new System.Drawing.Size(121, 77);
             this.BeginSolve.TabIndex = 23;
@@ -260,7 +260,7 @@ namespace LabMethodOptimize
             this.groupBoxMethod.Controls.Add(this.RBArtificial);
             this.groupBoxMethod.Controls.Add(this.RBSimplexMethod);
             this.groupBoxMethod.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.groupBoxMethod.Location = new System.Drawing.Point(18, 148);
+            this.groupBoxMethod.Location = new System.Drawing.Point(18, 152);
             this.groupBoxMethod.Name = "groupBoxMethod";
             this.groupBoxMethod.Size = new System.Drawing.Size(154, 141);
             this.groupBoxMethod.TabIndex = 22;
@@ -309,7 +309,7 @@ namespace LabMethodOptimize
             this.fractionType.Items.AddRange(new object[] {
             "Простые",
             "Десятичные"});
-            this.fractionType.Location = new System.Drawing.Point(18, 406);
+            this.fractionType.Location = new System.Drawing.Point(18, 410);
             this.fractionType.Name = "fractionType";
             this.fractionType.Size = new System.Drawing.Size(154, 23);
             this.fractionType.TabIndex = 20;
@@ -320,7 +320,7 @@ namespace LabMethodOptimize
             this.textBox8.BackColor = System.Drawing.Color.Ivory;
             this.textBox8.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox8.Location = new System.Drawing.Point(18, 387);
+            this.textBox8.Location = new System.Drawing.Point(18, 391);
             this.textBox8.Name = "textBox8";
             this.textBox8.ReadOnly = true;
             this.textBox8.Size = new System.Drawing.Size(130, 14);
@@ -334,7 +334,7 @@ namespace LabMethodOptimize
             this.optimizationProblem.Items.AddRange(new object[] {
             "Мин",
             "Макс"});
-            this.optimizationProblem.Location = new System.Drawing.Point(18, 342);
+            this.optimizationProblem.Location = new System.Drawing.Point(18, 346);
             this.optimizationProblem.Name = "optimizationProblem";
             this.optimizationProblem.Size = new System.Drawing.Size(154, 23);
             this.optimizationProblem.TabIndex = 18;
@@ -345,7 +345,7 @@ namespace LabMethodOptimize
             this.textBox7.BackColor = System.Drawing.Color.Ivory;
             this.textBox7.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox7.Location = new System.Drawing.Point(18, 323);
+            this.textBox7.Location = new System.Drawing.Point(18, 327);
             this.textBox7.Name = "textBox7";
             this.textBox7.ReadOnly = true;
             this.textBox7.Size = new System.Drawing.Size(130, 14);
@@ -358,7 +358,7 @@ namespace LabMethodOptimize
             this.textBox6.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 17F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.textBox6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox6.Location = new System.Drawing.Point(768, 21);
+            this.textBox6.Location = new System.Drawing.Point(769, 9);
             this.textBox6.Name = "textBox6";
             this.textBox6.ReadOnly = true;
             this.textBox6.Size = new System.Drawing.Size(202, 20);
@@ -373,10 +373,10 @@ namespace LabMethodOptimize
             this.basicVariablesTable.AllowUserToResizeRows = false;
             this.basicVariablesTable.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(229)))), ((int)(((byte)(238)))));
             this.basicVariablesTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.basicVariablesTable.Location = new System.Drawing.Point(766, 44);
+            this.basicVariablesTable.Location = new System.Drawing.Point(767, 32);
             this.basicVariablesTable.Name = "basicVariablesTable";
             this.basicVariablesTable.RowTemplate.Height = 30;
-            this.basicVariablesTable.Size = new System.Drawing.Size(550, 45);
+            this.basicVariablesTable.Size = new System.Drawing.Size(284, 53);
             this.basicVariablesTable.TabIndex = 15;
             this.basicVariablesTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.basicVariablesTable_CellValueChanged);
             // 
@@ -386,10 +386,10 @@ namespace LabMethodOptimize
             this.textBox4.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 17F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.textBox4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox4.Location = new System.Drawing.Point(197, 21);
+            this.textBox4.Location = new System.Drawing.Point(197, 6);
             this.textBox4.Name = "textBox4";
             this.textBox4.ReadOnly = true;
-            this.textBox4.Size = new System.Drawing.Size(202, 20);
+            this.textBox4.Size = new System.Drawing.Size(168, 20);
             this.textBox4.TabIndex = 12;
             this.textBox4.Text = "Целевая функция";
             // 
@@ -399,10 +399,10 @@ namespace LabMethodOptimize
             this.textBox3.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 17F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.textBox3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox3.Location = new System.Drawing.Point(197, 132);
+            this.textBox3.Location = new System.Drawing.Point(197, 88);
             this.textBox3.Name = "textBox3";
             this.textBox3.ReadOnly = true;
-            this.textBox3.Size = new System.Drawing.Size(202, 20);
+            this.textBox3.Size = new System.Drawing.Size(130, 20);
             this.textBox3.TabIndex = 11;
             this.textBox3.Text = "Ограничения";
             // 
@@ -413,10 +413,10 @@ namespace LabMethodOptimize
             this.objectiveFunctionTable.AllowUserToResizeRows = false;
             this.objectiveFunctionTable.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(229)))), ((int)(((byte)(238)))));
             this.objectiveFunctionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.objectiveFunctionTable.Location = new System.Drawing.Point(195, 44);
+            this.objectiveFunctionTable.Location = new System.Drawing.Point(195, 32);
             this.objectiveFunctionTable.Name = "objectiveFunctionTable";
             this.objectiveFunctionTable.RowTemplate.Height = 23;
-            this.objectiveFunctionTable.Size = new System.Drawing.Size(550, 45);
+            this.objectiveFunctionTable.Size = new System.Drawing.Size(550, 53);
             this.objectiveFunctionTable.TabIndex = 10;
             this.objectiveFunctionTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.objectiveFunctionTable_CellValueChanged);
             // 
@@ -528,26 +528,6 @@ namespace LabMethodOptimize
             this.tabPage3.TabIndex = 5;
             this.tabPage3.Text = "Метод искуственного базиса";
             // 
-            // tabPage4
-            // 
-            this.tabPage4.BackColor = System.Drawing.Color.Ivory;
-            this.tabPage4.Controls.Add(this.GAnswerText);
-            this.tabPage4.Controls.Add(this.GSSolutionTable);
-            this.tabPage4.Location = new System.Drawing.Point(4, 24);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(1392, 772);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "Графический метод";
-            // 
-            // saveFileDialog
-            // 
-            this.saveFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
-            // 
-            // openFileDialog
-            // 
-            this.openFileDialog.Filter = "Text files (*.txt)|*.txt";
-            // 
             // textBox10
             // 
             this.textBox10.BackColor = System.Drawing.Color.Ivory;
@@ -621,6 +601,19 @@ namespace LabMethodOptimize
             this.ABSolverTable.ReadOnly = true;
             this.ABSolverTable.Size = new System.Drawing.Size(750, 429);
             this.ABSolverTable.TabIndex = 7;
+            this.ABSolverTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.ABSolverTable_CellClick);
+            // 
+            // tabPage4
+            // 
+            this.tabPage4.BackColor = System.Drawing.Color.Ivory;
+            this.tabPage4.Controls.Add(this.GAnswerText);
+            this.tabPage4.Controls.Add(this.GSSolutionTable);
+            this.tabPage4.Location = new System.Drawing.Point(4, 24);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(1392, 772);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Графический метод";
             // 
             // GAnswerText
             // 
@@ -645,6 +638,14 @@ namespace LabMethodOptimize
             this.GSSolutionTable.ReadOnly = true;
             this.GSSolutionTable.Size = new System.Drawing.Size(646, 378);
             this.GSSolutionTable.TabIndex = 10;
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            // 
+            // openFileDialog
+            // 
+            this.openFileDialog.Filter = "Text files (*.txt)|*.txt";
             // 
             // Form1
             // 
@@ -674,9 +675,9 @@ namespace LabMethodOptimize
             ((System.ComponentModel.ISupportInitialize)(this.SSolutionTable)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ABSolverTable)).EndInit();
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ABSolverTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.GSSolutionTable)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

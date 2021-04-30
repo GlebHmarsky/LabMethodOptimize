@@ -13,6 +13,7 @@ namespace SimplexSolverClass
     {
         public uint RowCount;
         public uint ColumCount;
+        public bool isArtificialTask { get; set; }
         public Fraction[][] Matrix { get; set; }
         public Fraction[] RightPart { get; set; }
         public Fraction[] ObjFuncion { get; set; }
@@ -25,6 +26,7 @@ namespace SimplexSolverClass
 
         public SimplexSolver(uint Row, uint Colum)
         {
+            isArtificialTask = false;
             iteration = 0;
             ILBasisEl = new List<int>();
             ILFreeEl = new List<int>();
@@ -69,7 +71,7 @@ namespace SimplexSolverClass
             CalculateObjectiveFunctionValue(initObjFunc, fFindMax);
         }
 
-        private void CalculateObjectiveFunction(List<Fraction> initObjFunc, bool fFindMax)
+        public void CalculateObjectiveFunction(List<Fraction> initObjFunc, bool fFindMax)
         {
             for (int i = 0; i < ColumCount; i++)
             {
@@ -79,11 +81,11 @@ namespace SimplexSolverClass
                     Result += (-Matrix[g][i]) * initObjFunc[ILBasisEl[g]];
                 }
 
-                if (fFindMax) ObjFuncion[i] = -(Result + initObjFunc[ILFreeEl[i]]);//TODO FREE EL !!!!!!!!!!!!!!!!!!!!!
+                if (fFindMax) ObjFuncion[i] = -(Result + initObjFunc[ILFreeEl[i]]);
                 else ObjFuncion[i] = Result + initObjFunc[ILFreeEl[i]];
             }
         }
-        private void CalculateObjectiveFunctionValue(List<Fraction> initObjFunc, bool fFindMax)
+        public void CalculateObjectiveFunctionValue(List<Fraction> initObjFunc, bool fFindMax)
         {
             Fraction Result = new Fraction(0);
             for (int i = 0; i < RowCount; i++)
@@ -167,8 +169,7 @@ namespace SimplexSolverClass
             int iRow, iColum;
             iRow = bearingEls[indexBearingEl][0];
             iColum = bearingEls[indexBearingEl][1];
-
-            //TODO сменить индексы элементов, которые собственно и меняются, в List's
+            
             int tmpIndex = ILFreeEl[iColum];
             ILFreeEl[iColum] = ILBasisEl[iRow];
             ILBasisEl[iRow] = tmpIndex;
@@ -180,7 +181,7 @@ namespace SimplexSolverClass
 
             for (int i = 0; i < RowCount; i++)
                 NewMatrix[i] = new Fraction[ColumCount];
-            // four steps to succes;
+            // four steps to success;
             // 1
             NewMatrix[iRow][iColum] = 1 / Matrix[iRow][iColum];
             // 2
@@ -261,7 +262,7 @@ namespace SimplexSolverClass
             Fraction[] NewObjFunction = new Fraction[ColumCount - 1];//Понижаем размерность
             Fraction[][] NewMatrix = new Fraction[RowCount][];
             for (int i = 0; i < RowCount; i++)
-                NewMatrix[i] = new Fraction[ColumCount-1];
+                NewMatrix[i] = new Fraction[ColumCount - 1];
 
             int offset = 0;
             for (int g = 0; g < ColumCount; g++)
