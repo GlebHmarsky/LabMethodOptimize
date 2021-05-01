@@ -62,7 +62,7 @@ namespace LabMethodOptimize
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.SSTextAnswer = new System.Windows.Forms.TextBox();
+            this.SSAnswerText = new System.Windows.Forms.TextBox();
             this.SStepButton = new System.Windows.Forms.Button();
             this.SSolutionTable = new System.Windows.Forms.DataGridView();
             this.tabPage3 = new System.Windows.Forms.TabPage();
@@ -433,7 +433,7 @@ namespace LabMethodOptimize
             this.tabPage2.Controls.Add(this.textBox5);
             this.tabPage2.Controls.Add(this.panel2);
             this.tabPage2.Controls.Add(this.panel1);
-            this.tabPage2.Controls.Add(this.SSTextAnswer);
+            this.tabPage2.Controls.Add(this.SSAnswerText);
             this.tabPage2.Controls.Add(this.SStepButton);
             this.tabPage2.Controls.Add(this.SSolutionTable);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
@@ -505,14 +505,14 @@ namespace LabMethodOptimize
             // 
             // SSTextAnswer
             // 
-            this.SSTextAnswer.BackColor = System.Drawing.Color.OldLace;
-            this.SSTextAnswer.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.SSTextAnswer.Location = new System.Drawing.Point(1002, 375);
-            this.SSTextAnswer.Multiline = true;
-            this.SSTextAnswer.Name = "SSTextAnswer";
-            this.SSTextAnswer.ReadOnly = true;
-            this.SSTextAnswer.Size = new System.Drawing.Size(260, 60);
-            this.SSTextAnswer.TabIndex = 2;
+            this.SSAnswerText.BackColor = System.Drawing.Color.OldLace;
+            this.SSAnswerText.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.SSAnswerText.Location = new System.Drawing.Point(1002, 375);
+            this.SSAnswerText.Multiline = true;
+            this.SSAnswerText.Name = "SSTextAnswer";
+            this.SSAnswerText.ReadOnly = true;
+            this.SSAnswerText.Size = new System.Drawing.Size(260, 60);
+            this.SSAnswerText.TabIndex = 2;
             // 
             // SStepButton
             // 
@@ -773,7 +773,7 @@ namespace LabMethodOptimize
         private System.Windows.Forms.RadioButton RBSimplexMethod;
         private System.Windows.Forms.Button BeginSolve;
         private System.Windows.Forms.Button SStepButton;
-        private System.Windows.Forms.TextBox SSTextAnswer;
+        private System.Windows.Forms.TextBox SSAnswerText;
         private System.Windows.Forms.TextBox textBox9;
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.Panel panel2;

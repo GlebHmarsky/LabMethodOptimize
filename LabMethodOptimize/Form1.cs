@@ -189,7 +189,7 @@ namespace LabMethodOptimize
                         cell.Value = null;
                     }
                 }
-                SSTextAnswer.Text = "";
+                SSAnswerText.Text = "";
 
                 try
                 {
@@ -320,6 +320,7 @@ namespace LabMethodOptimize
 
         /*-------------------------------      WORK WITH ALL 3 METHODS     ------------------------------*/
 
+
         private void ActivateButtnosOnTab(int whitchTab)
         {
             switch (whitchTab)
@@ -341,10 +342,18 @@ namespace LabMethodOptimize
                     AllSStepButton.Enabled = false;
                     ABStepButton.Enabled = false;
                     break;
+                case -1: // Заблокировать Воообще все кнопки на форме
+                    SStepBackButton.Enabled = false;
+                    ABStepButton.Enabled = false;
+                    goto case 0;
                 case 0: // Заблокировать все
+
                     SStepButton.Enabled = false;
                     AllSStepButton.Enabled = false;
-                    ABStepButton.Enabled = false;
+
+
+                    ABStepBackButton.Enabled = false;
+                    AllABStepButton.Enabled = false;
                     break;
             }
         }
@@ -480,7 +489,7 @@ namespace LabMethodOptimize
             if (RBSimplexMethod.Checked) // Симплекс
             {
                 SSolutionTable.Rows.Clear();
-                SSTextAnswer.Text = "";
+                SSAnswerText.Text = "";
 
                 //Разрешение и блокиовка кнопок
                 ActivateButtnosOnTab(1);
@@ -603,14 +612,14 @@ namespace LabMethodOptimize
                 if (OnRightHaveNegativeEl)
                 {
                     ActivateButtnosOnTab(0);
-                    SSTextAnswer.Text = "Плохой начальный базис.\r\nПожалуйста, больше так не делайте.";
+                    SSAnswerText.Text = "Плохой начальный базис.\r\nПожалуйста, больше так не делайте.";
                     return;
                 }
 
                 string str;
                 if ((str = FindAndCheckBearingElements()).Length > 0)
                 {
-                    SSTextAnswer.Text = str;
+                    SSAnswerText.Text = str;
                     ActivateButtnosOnTab(0);
                 }
                 //ADD Посмотреть как тут записано и изменить в искуственном так же!
@@ -632,14 +641,13 @@ namespace LabMethodOptimize
                 FindAndCheckBearingElements();
                 pivotIndex = SSolver.FindOptimalBearingElement();
 
-                SSolver.pivotIndex = pivotIndex; //TODO Проследить за этой строкой!
-
+                SSolver.pivotIndex = pivotIndex;
+                MemoryOfSteps.Add(new SimplexSolver(SSolver));
                 ColorTheBearingEletemts(ABSolverTable);
             }
 
 
         }
-
         private void ColorTheBearingEletemts(DataGridView WorkTable)
         {
             if (SSolver.bearingEls.Count == 0) return;
@@ -713,6 +721,24 @@ namespace LabMethodOptimize
             }
             return "";
         }
+        private int BearingElsIndexOf(int[] arr)
+        {
+            int index = -1;
+            for (int i = 0; i < SSolver.bearingEls.Count; i++)
+            {
+                if (SSolver.bearingEls[i][0] == arr[0] && SSolver.bearingEls[i][1] == arr[1])
+                {
+                    index = i;
+                    break;
+                }
+            }
+            return index;
+        }
+
+
+        /*-------------------------------      SIMPLEX METHOD     ------------------------------*/
+
+
         private void SStepButton_Click(object sender, EventArgs e)
         {
             SSolver.SimplexStepWithCurrentEl(pivotIndex); //REM может тоже потребуется ловить возващаемое значение для проверки
@@ -721,7 +747,7 @@ namespace LabMethodOptimize
             string str;
             if ((str = FindAndCheckBearingElements()).Length > 0)
             {
-                SSTextAnswer.Text = str;
+                SSAnswerText.Text = str;
                 ActivateButtnosOnTab(0);
             }
 
@@ -740,7 +766,7 @@ namespace LabMethodOptimize
         private void SStepBackButton_Click(object sender, EventArgs e)
         {
             //Обнуляем текст, т.к. мы уже ушли от ответа на шаг назад
-            SSTextAnswer.Text = "";
+            SSAnswerText.Text = "";
             /*
              * Теперь мы должны подстереть в таблице последнюю строку и разумеется удалить из списка последний элемент
              * После проверить что у нас есть ещё более 1 элемент, иначе блокируем кнопку
@@ -774,6 +800,36 @@ namespace LabMethodOptimize
             }
             AllSStepButton.Enabled = false;
         }
+        private void SSolverTable_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (SSolver == null)
+            {
+                return;
+            }
+            int StartRowOfCurTable = StartRowForAnswerTable - 2 - (int)SSolver.RowCount;
+            int[] tmpArr = new int[2] { e.RowIndex - StartRowOfCurTable, e.ColumnIndex - 1 };
+            //bool res = SSolver.bearingEls.Exists(x => (x[0] == tmpArr[0] && x[1] == tmpArr[1]));
+            //bool res = SSolver.bearingEls.Contains(tmpArr);
+
+            int coolIndex;
+            coolIndex = BearingElsIndexOf(tmpArr); //Обычный indexOf не работает для массивов
+            if (coolIndex >= 0 && coolIndex != pivotIndex)
+            {
+                SSolutionTable[SSolver.bearingEls[pivotIndex][1] + 1, SSolver.bearingEls[pivotIndex][0] + StartRowOfCurTable].Style = AquamarineStyle;
+                MemoryOfSteps[MemoryOfSteps.Count - 1].pivotIndex = SSolver.pivotIndex = pivotIndex = coolIndex;
+                SSolutionTable[SSolver.bearingEls[pivotIndex][1] + 1, SSolver.bearingEls[pivotIndex][0] + StartRowOfCurTable].Style = LightCoralStyle;
+            }
+            //Иначе Пользователь клацнул не туда, так что ничего не делаем
+        }
+
+
+        /*-------------------------------      ARTIFICTIAL METHOD     ------------------------------*/
+
+        private int BackToDirectTask(SimplexSolver SSolver)
+        {
+
+            return 0;
+        }
         private void ABStepButton_Click(object sender, EventArgs e)
         {
             SSolver.SimplexStepWithCurrentEl(pivotIndex); //REM может тоже потребуется ловить возващаемое значение для проверки
@@ -785,17 +841,22 @@ namespace LabMethodOptimize
                 if (!SSolver.isArtificialTask)
                     ABAnswerText.Text = str;
             }
-            if ((pivotIndex = SSolver.FindOptimalBearingElement()) < 0)
+            pivotIndex = SSolver.FindOptimalBearingElement();
+            SSolver.pivotIndex = pivotIndex;
+            MemoryOfSteps.Add(new SimplexSolver(SSolver));
+            ABStepBackButton.Enabled = true;
+            if (pivotIndex < 0)
             {
                 //Нету элементов и надо проверить что это вспомогательная задача тогда продолжать решение.
                 if (!SSolver.isArtificialTask)
                 {
+                    //Тогда прямая задача решена
                     ActivateButtnosOnTab(0);
                     return;
                 }
 
                 /* 
-                 * Тогда вспомогательная задача "решена" и надо удостовериться что все базисные переменные выведены
+                 * Иначе вспомогательная задача "решена" и надо удостовериться что все базисные переменные выведены
                  *                 
                  * Могут быть следующие развития событий
                  * >У нас система несовместна - не удаётся вывести переменную 
@@ -844,7 +905,11 @@ namespace LabMethodOptimize
                         }
                         //иначе есть переменные по которым будем ща скакать
                         //но сначала нужно найти индекс и предоставить пользователю выбирать
-                        if ((pivotIndex = SSolver.FindOptimalBearingElement()) < 0) //Конкретно тут проверка откровенно лишняя, т.к. опорные точно есть, но пусть будет
+                        pivotIndex = SSolver.FindOptimalBearingElement();
+                        SSolver.pivotIndex = pivotIndex;
+                        MemoryOfSteps.Add(new SimplexSolver(SSolver));
+                        ABStepBackButton.Enabled = true;
+                        if (pivotIndex < 0) //Конкретно тут проверка откровенно лишняя, т.к. опорные точно есть, но пусть будет
                         {
                             //Нету элементов и надо проверить что это вспомогательная задача тогда продолжать решение.
                             if (!SSolver.isArtificialTask)
@@ -858,8 +923,12 @@ namespace LabMethodOptimize
                     }
                 }
 
-
-                SSolver.isArtificialTask = false;
+                //Возрвращаемся к прямой задаче с полученным базисом
+                if (SSolver.isArtificialTask)
+                {
+                    SSolver.isArtificialTask = false;
+                    SSolver.iteration = 0;
+                }
                 List<Fraction> objectiveFunctionArr = new List<Fraction>();
                 try
                 {
@@ -893,22 +962,35 @@ namespace LabMethodOptimize
                     if (!SSolver.isArtificialTask)
                         ABAnswerText.Text = str;
                 }
-                if ((pivotIndex = SSolver.FindOptimalBearingElement()) < 0)
+                pivotIndex = SSolver.FindOptimalBearingElement();
+                SSolver.pivotIndex = pivotIndex;
+                MemoryOfSteps.Add(new SimplexSolver(SSolver));
+                ABStepBackButton.Enabled = true;
+                if (pivotIndex < 0)
                 {
-                    //Нету элементов и надо проверить что это вспомогательная задача тогда продолжать решение.
+                    //Нету элементов и надо проверить что это вспомогательная задача, тогда продолжать решение.
                     if (!SSolver.isArtificialTask)
                     {
                         ActivateButtnosOnTab(0);
                         return;
                     }
                 }
-                SSolver.iteration = 0;
             }
             ColorTheBearingEletemts(ABSolverTable);
         }
         private void ABStepBackButton_Click(object sender, EventArgs e)
         {
-
+            //ADD Это ещё далеко не всё! Т.к. шаг назад для искуственного несколько сложнее в связи с решением его.
+            ABAnswerText.Text = "";
+            ActivateButtnosOnTab(2);
+            MemoryOfSteps.RemoveAt(MemoryOfSteps.Count - 1);//Удаляем последний
+            if (MemoryOfSteps.Count <= 1)
+            {
+                ABStepBackButton.Enabled = false;
+            }
+            SSolver = new SimplexSolver(MemoryOfSteps[MemoryOfSteps.Count - 1]);
+            RemoveLastTableFromSolutionGridView(ABSolverTable);
+            pivotIndex = SSolver.pivotIndex; //Возвращаем pivot в старое положение.
         }
         private void AllABStepButton_Click(object sender, EventArgs e)
         {
@@ -917,40 +999,6 @@ namespace LabMethodOptimize
                 ABStepButton.PerformClick();
             }
             AllABStepButton.Enabled = false;
-        }
-        private int BearingElsIndexOf(int[] arr)
-        {
-            int index = -1;
-            for (int i = 0; i < SSolver.bearingEls.Count; i++)
-            {
-                if (SSolver.bearingEls[i][0] == arr[0] && SSolver.bearingEls[i][1] == arr[1])
-                {
-                    index = i;
-                    break;
-                }
-            }
-            return index;
-        }
-        private void SSolverTable_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (SSolver == null)
-            {
-                return;
-            }
-            int StartRowOfCurTable = StartRowForAnswerTable - 2 - (int)SSolver.RowCount;
-            int[] tmpArr = new int[2] { e.RowIndex - StartRowOfCurTable, e.ColumnIndex - 1 };
-            //bool res = SSolver.bearingEls.Exists(x => (x[0] == tmpArr[0] && x[1] == tmpArr[1]));
-            //bool res = SSolver.bearingEls.Contains(tmpArr);
-
-            int coolIndex;
-            coolIndex = BearingElsIndexOf(tmpArr); //Обычный indexOf не работает для массивов
-            if (coolIndex >= 0 && coolIndex != pivotIndex)
-            {
-                SSolutionTable[SSolver.bearingEls[pivotIndex][1] + 1, SSolver.bearingEls[pivotIndex][0] + StartRowOfCurTable].Style = AquamarineStyle;
-                MemoryOfSteps[MemoryOfSteps.Count - 1].pivotIndex = SSolver.pivotIndex = pivotIndex = coolIndex;
-                SSolutionTable[SSolver.bearingEls[pivotIndex][1] + 1, SSolver.bearingEls[pivotIndex][0] + StartRowOfCurTable].Style = LightCoralStyle;
-            }
-            //Иначе Пользователь клацнул не туда, так что ничего не делаем
         }
         private void ABSolverTable_CellClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -971,6 +1019,11 @@ namespace LabMethodOptimize
             }
             //Иначе Пользователь клацнул не туда, так что ничего не делаем
         }
+
+
+        /*-------------------------------      PRINT TASKS     ------------------------------*/
+
+
         private void PrintResultToSoulutionGridView(DataGridView SSolutionTable, SimplexSolver SSolver)
         {
             //TODO Сделать проверку что если новая таблица вылетает за границы то перетаскивать скролл ниже 
@@ -1032,7 +1085,7 @@ namespace LabMethodOptimize
         }
 
 
-        /* -----------------------------------    ПОБОЧНАЯ МАЛЕНЬКАЯ РАБОТА (кнопочки там всякие)    --------------------------------------**/
+        /* -----------------------------------    SUB WORK (кнопочки там всякие)    --------------------------------------**/
 
 
         private void basicVariablesTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
