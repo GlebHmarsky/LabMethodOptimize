@@ -827,7 +827,58 @@ namespace LabMethodOptimize
 
         private int BackToDirectTask(SimplexSolver SSolver)
         {
+            if (SSolver.isArtificialTask)
+            {
+                SSolver.isArtificialTask = false;
+                SSolver.iteration = 0;
+            }
+            List<Fraction> objectiveFunctionArr = new List<Fraction>();
+            try
+            {
+                foreach (DataGridViewCell cell in objectiveFunctionTable.Rows[0].Cells)
+                {
+                    objectiveFunctionArr.Add(new Fraction(cell.Value.ToString()));
+                }
 
+                SSolver.CalculateObjectiveFunction(objectiveFunctionArr, optimizationProblem.SelectedIndex == 1);
+                SSolver.CalculateObjectiveFunctionValue(objectiveFunctionArr, optimizationProblem.SelectedIndex == 1);
+
+            }
+            catch (FractionException exp)
+            {
+                MessageBox.Show($"Format Fraction error.\n\nError message: {exp.Message}\n\n");
+                ActivateButtnosOnTab(0);
+                return 1;
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show($"Security error.\n\nError message: {exp.Message}\n\n" +
+                $"Details:\n\n{exp.StackTrace}");
+                ActivateButtnosOnTab(0);
+                return 1;
+            }
+
+
+            PrintResultToSoulutionGridView(ABSolverTable, SSolver);
+            string str;
+            if ((str = FindAndCheckBearingElements()).Length > 0)
+            {
+                if (!SSolver.isArtificialTask)
+                    ABAnswerText.Text = str;
+            }
+            pivotIndex = SSolver.FindOptimalBearingElement();
+            SSolver.pivotIndex = pivotIndex;
+            MemoryOfSteps.Add(new SimplexSolver(SSolver));
+            ABStepBackButton.Enabled = true;
+            if (pivotIndex < 0)
+            {
+                //Нету элементов и надо проверить что это вспомогательная задача, тогда продолжать решение.
+                if (!SSolver.isArtificialTask)
+                {
+                    ActivateButtnosOnTab(0);
+                    return 1;
+                }
+            }
             return 0;
         }
         private void ABStepButton_Click(object sender, EventArgs e)
@@ -867,6 +918,7 @@ namespace LabMethodOptimize
                  * 
                  * Придётся дополнительно искуственно заполнять список возможных опорных элементов
                  */
+
                 for (int i = 0; i < RowCount; i++)
                 {
                     if (SSolver.ILBasisEl[i] > ColumCount - 1)//Есть вспомогательный элемент в строке i
@@ -924,56 +976,11 @@ namespace LabMethodOptimize
                 }
 
                 //Возрвращаемся к прямой задаче с полученным базисом
-                if (SSolver.isArtificialTask)
+                if (BackToDirectTask(SSolver) > 0)
                 {
-                    SSolver.isArtificialTask = false;
-                    SSolver.iteration = 0;
-                }
-                List<Fraction> objectiveFunctionArr = new List<Fraction>();
-                try
-                {
-                    foreach (DataGridViewCell cell in objectiveFunctionTable.Rows[0].Cells)
-                    {
-                        objectiveFunctionArr.Add(new Fraction(cell.Value.ToString()));
-                    }
-
-                    SSolver.CalculateObjectiveFunction(objectiveFunctionArr, optimizationProblem.SelectedIndex == 1);
-                    SSolver.CalculateObjectiveFunctionValue(objectiveFunctionArr, optimizationProblem.SelectedIndex == 1);
-
-                }
-                catch (FractionException exp)
-                {
-                    MessageBox.Show($"Format Fraction error.\n\nError message: {exp.Message}\n\n");
+                    //Получили ошибку
                     ActivateButtnosOnTab(0);
                     return;
-                }
-                catch (Exception exp)
-                {
-                    MessageBox.Show($"Security error.\n\nError message: {exp.Message}\n\n" +
-                    $"Details:\n\n{exp.StackTrace}");
-                    ActivateButtnosOnTab(0);
-                    return;
-                }
-
-
-                PrintResultToSoulutionGridView(ABSolverTable, SSolver);
-                if ((str = FindAndCheckBearingElements()).Length > 0)
-                {
-                    if (!SSolver.isArtificialTask)
-                        ABAnswerText.Text = str;
-                }
-                pivotIndex = SSolver.FindOptimalBearingElement();
-                SSolver.pivotIndex = pivotIndex;
-                MemoryOfSteps.Add(new SimplexSolver(SSolver));
-                ABStepBackButton.Enabled = true;
-                if (pivotIndex < 0)
-                {
-                    //Нету элементов и надо проверить что это вспомогательная задача, тогда продолжать решение.
-                    if (!SSolver.isArtificialTask)
-                    {
-                        ActivateButtnosOnTab(0);
-                        return;
-                    }
                 }
             }
             ColorTheBearingEletemts(ABSolverTable);
@@ -991,6 +998,16 @@ namespace LabMethodOptimize
             SSolver = new SimplexSolver(MemoryOfSteps[MemoryOfSteps.Count - 1]);
             RemoveLastTableFromSolutionGridView(ABSolverTable);
             pivotIndex = SSolver.pivotIndex; //Возвращаем pivot в старое положение.
+
+            //Проверим, что этот старый шаг, не был окончанием вспомгательной задачи
+            if (SSolver.isArtificialTask)
+            {
+                if (SSolver.OFV == 0)
+                {
+                    //Тогда сделать ещё шаг назад в силу реализации кода. 
+                    ABStepBackButton.PerformClick();
+                }
+            }
         }
         private void AllABStepButton_Click(object sender, EventArgs e)
         {
