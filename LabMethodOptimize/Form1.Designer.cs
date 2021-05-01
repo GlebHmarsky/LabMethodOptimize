@@ -56,14 +56,17 @@ namespace LabMethodOptimize
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.objectiveFunctionTable = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.SStepBackButton = new System.Windows.Forms.Button();
+            this.AllSStepButton = new System.Windows.Forms.Button();
             this.textBox9 = new System.Windows.Forms.TextBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.SSTextAnswer = new System.Windows.Forms.TextBox();
-            this.ButtonSimplexStep = new System.Windows.Forms.Button();
+            this.SStepButton = new System.Windows.Forms.Button();
             this.SSolutionTable = new System.Windows.Forms.DataGridView();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.AllABStepButton = new System.Windows.Forms.Button();
             this.textBox10 = new System.Windows.Forms.TextBox();
             this.textBox11 = new System.Windows.Forms.TextBox();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -76,6 +79,7 @@ namespace LabMethodOptimize
             this.GSSolutionTable = new System.Windows.Forms.DataGridView();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.ABStepBackButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.restrictionTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownColumn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRow)).BeginInit();
@@ -423,12 +427,14 @@ namespace LabMethodOptimize
             // tabPage2
             // 
             this.tabPage2.BackColor = System.Drawing.Color.Ivory;
+            this.tabPage2.Controls.Add(this.SStepBackButton);
+            this.tabPage2.Controls.Add(this.AllSStepButton);
             this.tabPage2.Controls.Add(this.textBox9);
             this.tabPage2.Controls.Add(this.textBox5);
             this.tabPage2.Controls.Add(this.panel2);
             this.tabPage2.Controls.Add(this.panel1);
             this.tabPage2.Controls.Add(this.SSTextAnswer);
-            this.tabPage2.Controls.Add(this.ButtonSimplexStep);
+            this.tabPage2.Controls.Add(this.SStepButton);
             this.tabPage2.Controls.Add(this.SSolutionTable);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
@@ -436,6 +442,28 @@ namespace LabMethodOptimize
             this.tabPage2.Size = new System.Drawing.Size(1392, 772);
             this.tabPage2.TabIndex = 4;
             this.tabPage2.Text = "Симплекс метод";
+            // 
+            // SStepBackButton
+            // 
+            this.SStepBackButton.Enabled = false;
+            this.SStepBackButton.Location = new System.Drawing.Point(1002, 45);
+            this.SStepBackButton.Name = "SStepBackButton";
+            this.SStepBackButton.Size = new System.Drawing.Size(211, 78);
+            this.SStepBackButton.TabIndex = 8;
+            this.SStepBackButton.Text = "Шаг назад";
+            this.SStepBackButton.UseVisualStyleBackColor = true;
+            this.SStepBackButton.Click += new System.EventHandler(this.SStepBackButton_Click);
+            // 
+            // AllSStepButton
+            // 
+            this.AllSStepButton.Enabled = false;
+            this.AllSStepButton.Location = new System.Drawing.Point(1002, 213);
+            this.AllSStepButton.Name = "AllSStepButton";
+            this.AllSStepButton.Size = new System.Drawing.Size(211, 78);
+            this.AllSStepButton.TabIndex = 7;
+            this.AllSStepButton.Text = "Решить до конца";
+            this.AllSStepButton.UseVisualStyleBackColor = true;
+            this.AllSStepButton.Click += new System.EventHandler(this.AllSStepButton_Click);
             // 
             // textBox9
             // 
@@ -486,16 +514,16 @@ namespace LabMethodOptimize
             this.SSTextAnswer.Size = new System.Drawing.Size(260, 60);
             this.SSTextAnswer.TabIndex = 2;
             // 
-            // ButtonSimplexStep
+            // SStepButton
             // 
-            this.ButtonSimplexStep.Enabled = false;
-            this.ButtonSimplexStep.Location = new System.Drawing.Point(1002, 80);
-            this.ButtonSimplexStep.Name = "ButtonSimplexStep";
-            this.ButtonSimplexStep.Size = new System.Drawing.Size(211, 78);
-            this.ButtonSimplexStep.TabIndex = 1;
-            this.ButtonSimplexStep.Text = "Симплекс шаг";
-            this.ButtonSimplexStep.UseVisualStyleBackColor = true;
-            this.ButtonSimplexStep.Click += new System.EventHandler(this.ButtonSimplexStep_Click);
+            this.SStepButton.Enabled = false;
+            this.SStepButton.Location = new System.Drawing.Point(1002, 129);
+            this.SStepButton.Name = "SStepButton";
+            this.SStepButton.Size = new System.Drawing.Size(211, 78);
+            this.SStepButton.TabIndex = 1;
+            this.SStepButton.Text = "Симплекс шаг";
+            this.SStepButton.UseVisualStyleBackColor = true;
+            this.SStepButton.Click += new System.EventHandler(this.SStepButton_Click);
             // 
             // SSolutionTable
             // 
@@ -509,11 +537,13 @@ namespace LabMethodOptimize
             this.SSolutionTable.ReadOnly = true;
             this.SSolutionTable.Size = new System.Drawing.Size(965, 429);
             this.SSolutionTable.TabIndex = 0;
-            this.SSolutionTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SolutionGridView_CellClick);
+            this.SSolutionTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SSolverTable_CellClick);
             // 
             // tabPage3
             // 
             this.tabPage3.BackColor = System.Drawing.Color.Ivory;
+            this.tabPage3.Controls.Add(this.ABStepBackButton);
+            this.tabPage3.Controls.Add(this.AllABStepButton);
             this.tabPage3.Controls.Add(this.textBox10);
             this.tabPage3.Controls.Add(this.textBox11);
             this.tabPage3.Controls.Add(this.panel3);
@@ -527,6 +557,18 @@ namespace LabMethodOptimize
             this.tabPage3.Size = new System.Drawing.Size(1392, 772);
             this.tabPage3.TabIndex = 5;
             this.tabPage3.Text = "Метод искуственного базиса";
+            // 
+            // AllABStepButton
+            // 
+            this.AllABStepButton.Enabled = false;
+            this.AllABStepButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.AllABStepButton.Location = new System.Drawing.Point(776, 241);
+            this.AllABStepButton.Name = "AllABStepButton";
+            this.AllABStepButton.Size = new System.Drawing.Size(211, 78);
+            this.AllABStepButton.TabIndex = 14;
+            this.AllABStepButton.Text = "Решить до конца";
+            this.AllABStepButton.UseVisualStyleBackColor = true;
+            this.AllABStepButton.Click += new System.EventHandler(this.AllABStepButton_Click);
             // 
             // textBox10
             // 
@@ -647,6 +689,18 @@ namespace LabMethodOptimize
             // 
             this.openFileDialog.Filter = "Text files (*.txt)|*.txt";
             // 
+            // ABStepBackButton
+            // 
+            this.ABStepBackButton.Enabled = false;
+            this.ABStepBackButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.ABStepBackButton.Location = new System.Drawing.Point(776, 73);
+            this.ABStepBackButton.Name = "ABStepBackButton";
+            this.ABStepBackButton.Size = new System.Drawing.Size(211, 78);
+            this.ABStepBackButton.TabIndex = 15;
+            this.ABStepBackButton.Text = "Шаг Назад";
+            this.ABStepBackButton.UseVisualStyleBackColor = true;
+            this.ABStepBackButton.Click += new System.EventHandler(this.ABStepBackButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -718,7 +772,7 @@ namespace LabMethodOptimize
         private System.Windows.Forms.RadioButton RBArtificial;
         private System.Windows.Forms.RadioButton RBSimplexMethod;
         private System.Windows.Forms.Button BeginSolve;
-        private System.Windows.Forms.Button ButtonSimplexStep;
+        private System.Windows.Forms.Button SStepButton;
         private System.Windows.Forms.TextBox SSTextAnswer;
         private System.Windows.Forms.TextBox textBox9;
         private System.Windows.Forms.TextBox textBox5;
@@ -733,6 +787,10 @@ namespace LabMethodOptimize
         private System.Windows.Forms.DataGridView ABSolverTable;
         private System.Windows.Forms.TextBox GAnswerText;
         private System.Windows.Forms.DataGridView GSSolutionTable;
+        private System.Windows.Forms.Button AllSStepButton;
+        private System.Windows.Forms.Button AllABStepButton;
+        private System.Windows.Forms.Button SStepBackButton;
+        private System.Windows.Forms.Button ABStepBackButton;
     }
 }
 

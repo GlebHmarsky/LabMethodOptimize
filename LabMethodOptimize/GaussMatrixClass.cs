@@ -51,28 +51,15 @@ namespace GaussMatrixClass
             }
 
 
-            //BUG проверить нет ли у нас на опорных местах элементы == 0
             for (int i = 0; i < RowCount; i++)
             {
-                if (Matrix[i][IndexListBasisElements[i]]==0)//Базисный элемент в строке = 0
+                if (Matrix[i][IndexListBasisElements[i]] == 0)//Базисный элемент в строке = 0
                 {
                     //Зависимые условия или система несовместна
                     //В любом случае выходим и ругаемся на пользователя
                     return 1;
                 }
             }
-            //if (Matrix[RowCount - 1][ColumCount - 1] == 0 && RightPart[RowCount - 1] != 0)
-            //{
-            //    //Нет решений
-            //    Console.WriteLine("Нет решений!");
-            //    return 1;
-            //}
-            //if (Matrix[RowCount - 1][ColumCount - 1] == 0 && RightPart[RowCount - 1] == 0)
-            //{
-            //    //бм решений
-            //    Console.WriteLine("Бесконечно много решений!");
-            //    return 1;
-            //}
 
             for (int i = 0; i < RowCount; i++)// Делаем на базисных элементах единицы
             {
@@ -97,17 +84,6 @@ namespace GaussMatrixClass
                     RightPart[g] -= MultipleCoeff * RightPart[i];
                 }
             }
-
-            //for (int h = 0; h <= (int)(RowCount - 2); h++)// После этого цикла имеем единичную матрицу
-            //{
-            //    for (int i = (int)(RowCount - 2) - h; i >= 0; i--)
-            //    {
-            //        MultipleCoeff = Matrix[i][(int)(ColumCount - 1) - h];
-            //        Matrix[i][(int)(ColumCount - 1) - h] -= MultipleCoeff;
-            //        RightPart[i] -= MultipleCoeff * RightPart[RowCount - 1 - h];
-            //    }
-            //}
-
             return 0;
         }
 

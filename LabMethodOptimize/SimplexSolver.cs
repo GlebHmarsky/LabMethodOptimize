@@ -13,11 +13,11 @@ namespace SimplexSolverClass
     {
         public uint RowCount;
         public uint ColumCount;
+        public int pivotIndex;
         public bool isArtificialTask { get; set; }
         public Fraction[][] Matrix { get; set; }
         public Fraction[] RightPart { get; set; }
         public Fraction[] ObjFuncion { get; set; }
-        public Fraction[] InitialObjFuncion { get; set; }
         public List<int> ILBasisEl { get; set; }
         public List<int> ILFreeEl { get; set; }
         public Fraction OFV { get; set; }
@@ -26,6 +26,7 @@ namespace SimplexSolverClass
 
         public SimplexSolver(uint Row, uint Colum)
         {
+            pivotIndex = -1;
             isArtificialTask = false;
             iteration = 0;
             ILBasisEl = new List<int>();
@@ -44,6 +45,27 @@ namespace SimplexSolverClass
             ColumCount = Colum;
 
             bearingEls = new List<int[]>();
+        }
+
+        public SimplexSolver(SimplexSolver ss)
+        {
+            pivotIndex = ss.pivotIndex;
+            isArtificialTask = ss.isArtificialTask;
+            iteration = ss.iteration;
+            ILBasisEl = new List<int>(ss.ILBasisEl);
+            ILFreeEl = new List<int>(ss.ILFreeEl);
+
+            Matrix = ss.Matrix;
+
+            RightPart = ss.RightPart;
+            ObjFuncion = ss.ObjFuncion;
+
+            OFV = new Fraction(ss.OFV);
+
+            RowCount = ss.RowCount;
+            ColumCount = ss.ColumCount;
+
+            bearingEls = new List<int[]>(ss.bearingEls);
         }
         /*
          * Заполняет симплекс таблицу из таблицы гаусса 
@@ -107,10 +129,10 @@ namespace SimplexSolverClass
                 indexBasisEl = -1;
 
                 Fraction MinEl = new Fraction(-1);
-                if (ObjFuncion[i] < 0) //то пробежаться по столбцу и найти тот самый элемент.
+                if (ObjFuncion[i] < 0) //то пробежаться по столбцу и найти те* самые элементы.
                 {
                     indexFreeEl = i; //запоминаем столбец где есть отрицательный элемент снизу
-                    //Нужно подобрать первый подходящий минимальный элемент. 
+                    //Нужно найти подходящий минимальный элемент. 
                     fHaveNegativeCol = true;
                     for (int g = 0; g < RowCount; g++)//Ищет первый попавшийся хороший элемент в столбце
                     {
@@ -135,11 +157,25 @@ namespace SimplexSolverClass
                         }
                     }
 
+                    if (indexBasisEl >= 0) //Нашёлся такой элемент в столбце
+                    {
+                        bearingEls.Add(new int[2] { indexBasisEl, indexFreeEl });
+
+                        //После ещё раз нужно пробежаться зная минимальный и выбрать все равные минимальному.
+                        for (int g = 0; g < RowCount; g++)
+                        {
+                            if (g == indexBasisEl) continue;
+                            if (Matrix[g][i] > 0)
+                            {
+                                if ((RightPart[g] / Matrix[g][i]) == MinEl)
+                                {
+                                    bearingEls.Add(new int[2] { g, indexFreeEl });
+                                }
+                            }
+                        }
+                    }
                 }
-                if (indexBasisEl >= 0) //Нашёлся такой элемент в столбце
-                {
-                    bearingEls.Add(new int[2] { indexBasisEl, indexFreeEl });
-                }
+
 
 
 
@@ -169,7 +205,7 @@ namespace SimplexSolverClass
             int iRow, iColum;
             iRow = bearingEls[indexBearingEl][0];
             iColum = bearingEls[indexBearingEl][1];
-            
+
             int tmpIndex = ILFreeEl[iColum];
             ILFreeEl[iColum] = ILBasisEl[iRow];
             ILBasisEl[iRow] = tmpIndex;
