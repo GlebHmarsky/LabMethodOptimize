@@ -33,6 +33,7 @@ namespace LabMethodOptimize
         public Form1()
         {
             this.Text = "Simplex Solver";
+            
             InitializeComponent();
             optimizationProblem.SelectedIndex = 0;
             fractionType.SelectedIndex = 0;
@@ -330,17 +331,21 @@ namespace LabMethodOptimize
                     AllSStepButton.Enabled = true;
 
                     ABStepButton.Enabled = false;
+                    AllABStepButton.Enabled = false;
                     break;
                 case 2: // Искуственный
                     SStepButton.Enabled = false;
                     AllSStepButton.Enabled = false;
 
                     ABStepButton.Enabled = true;
+                    AllABStepButton.Enabled = true;
                     break;
                 case 3: // Графика
                     SStepButton.Enabled = false;
                     AllSStepButton.Enabled = false;
+
                     ABStepButton.Enabled = false;
+                    AllABStepButton.Enabled = false;
                     break;
                 case -1: // Заблокировать Воообще все кнопки на форме
                     SStepBackButton.Enabled = false;
@@ -532,6 +537,9 @@ namespace LabMethodOptimize
             }
             else if (RBGraphic.Checked) // Графика
             {
+                GSSolutionTable.Rows.Clear();
+                GAnswerText.Text = "";
+
                 ActivateButtnosOnTab(3);
 
                 if (RowCount > ColumCount - 2)
@@ -644,6 +652,11 @@ namespace LabMethodOptimize
                 SSolver.pivotIndex = pivotIndex;
                 MemoryOfSteps.Add(new SimplexSolver(SSolver));
                 ColorTheBearingEletemts(ABSolverTable);
+            }
+            else if (RBGraphic.Checked)
+            {
+                PrintResultToSoulutionGridView(GSSolutionTable, SSolver);
+                Make2DModel();
             }
 
 
@@ -824,6 +837,7 @@ namespace LabMethodOptimize
 
 
         /*-------------------------------      ARTIFICTIAL METHOD     ------------------------------*/
+
 
         private int BackToDirectTask(SimplexSolver SSolver)
         {
@@ -1035,6 +1049,26 @@ namespace LabMethodOptimize
                 ABSolverTable[SSolver.bearingEls[pivotIndex][1] + 1, SSolver.bearingEls[pivotIndex][0] + StartRowOfCurTable].Style = LightCoralStyle;
             }
             //Иначе Пользователь клацнул не туда, так что ничего не делаем
+        }
+
+
+        /*-------------------------------      GRAPHIC METHOD     ------------------------------*/
+
+
+        private void Make2DModel()
+        {
+            /*
+             * Найдём все точки пересечения и только после будем рисовать все все примые
+             * Почему так?
+             * После того как найдём все точки, и в целом ответ, 
+             * можно будет определить границы самого графика путём поиска 4 границ в виде квадрата.
+             * Когда определим границы нам ничего не стоит просто пробегаться слева направо и рисовать каждую прямую как есть.
+             * 
+             */
+            SolidBrush bruh = new SolidBrush(Color.Red);
+            Graphics gr = this.GraphicPanel.CreateGraphics();
+            PaintEventArgs paintEvArgs = new PaintEventArgs(gr, this.GraphicPanel.ClientRectangle);
+            paintEvArgs.Graphics.FillRectangle(bruh, 50, 50, 200, 200);
         }
 
 

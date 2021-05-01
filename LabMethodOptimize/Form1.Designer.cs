@@ -66,6 +66,7 @@ namespace LabMethodOptimize
             this.SStepButton = new System.Windows.Forms.Button();
             this.SSolutionTable = new System.Windows.Forms.DataGridView();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.ABStepBackButton = new System.Windows.Forms.Button();
             this.AllABStepButton = new System.Windows.Forms.Button();
             this.textBox10 = new System.Windows.Forms.TextBox();
             this.textBox11 = new System.Windows.Forms.TextBox();
@@ -75,11 +76,11 @@ namespace LabMethodOptimize
             this.ABStepButton = new System.Windows.Forms.Button();
             this.ABSolverTable = new System.Windows.Forms.DataGridView();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.GraphicPanel = new System.Windows.Forms.Panel();
             this.GAnswerText = new System.Windows.Forms.TextBox();
             this.GSSolutionTable = new System.Windows.Forms.DataGridView();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.ABStepBackButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.restrictionTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownColumn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRow)).BeginInit();
@@ -503,13 +504,13 @@ namespace LabMethodOptimize
             this.panel1.Size = new System.Drawing.Size(26, 23);
             this.panel1.TabIndex = 3;
             // 
-            // SSTextAnswer
+            // SSAnswerText
             // 
             this.SSAnswerText.BackColor = System.Drawing.Color.OldLace;
             this.SSAnswerText.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.SSAnswerText.Location = new System.Drawing.Point(1002, 375);
             this.SSAnswerText.Multiline = true;
-            this.SSAnswerText.Name = "SSTextAnswer";
+            this.SSAnswerText.Name = "SSAnswerText";
             this.SSAnswerText.ReadOnly = true;
             this.SSAnswerText.Size = new System.Drawing.Size(260, 60);
             this.SSAnswerText.TabIndex = 2;
@@ -557,6 +558,18 @@ namespace LabMethodOptimize
             this.tabPage3.Size = new System.Drawing.Size(1392, 772);
             this.tabPage3.TabIndex = 5;
             this.tabPage3.Text = "Метод искуственного базиса";
+            // 
+            // ABStepBackButton
+            // 
+            this.ABStepBackButton.Enabled = false;
+            this.ABStepBackButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.ABStepBackButton.Location = new System.Drawing.Point(776, 73);
+            this.ABStepBackButton.Name = "ABStepBackButton";
+            this.ABStepBackButton.Size = new System.Drawing.Size(211, 78);
+            this.ABStepBackButton.TabIndex = 15;
+            this.ABStepBackButton.Text = "Шаг Назад";
+            this.ABStepBackButton.UseVisualStyleBackColor = true;
+            this.ABStepBackButton.Click += new System.EventHandler(this.ABStepBackButton_Click);
             // 
             // AllABStepButton
             // 
@@ -648,6 +661,7 @@ namespace LabMethodOptimize
             // tabPage4
             // 
             this.tabPage4.BackColor = System.Drawing.Color.Ivory;
+            this.tabPage4.Controls.Add(this.GraphicPanel);
             this.tabPage4.Controls.Add(this.GAnswerText);
             this.tabPage4.Controls.Add(this.GSSolutionTable);
             this.tabPage4.Location = new System.Drawing.Point(4, 24);
@@ -657,11 +671,20 @@ namespace LabMethodOptimize
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Графический метод";
             // 
+            // GraphicPanel
+            // 
+            this.GraphicPanel.BackColor = System.Drawing.Color.White;
+            this.GraphicPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.GraphicPanel.Location = new System.Drawing.Point(518, 6);
+            this.GraphicPanel.Name = "GraphicPanel";
+            this.GraphicPanel.Size = new System.Drawing.Size(785, 589);
+            this.GraphicPanel.TabIndex = 13;
+            // 
             // GAnswerText
             // 
             this.GAnswerText.BackColor = System.Drawing.Color.OldLace;
             this.GAnswerText.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.GAnswerText.Location = new System.Drawing.Point(394, 390);
+            this.GAnswerText.Location = new System.Drawing.Point(231, 337);
             this.GAnswerText.Multiline = true;
             this.GAnswerText.Name = "GAnswerText";
             this.GAnswerText.ReadOnly = true;
@@ -678,7 +701,7 @@ namespace LabMethodOptimize
             this.GSSolutionTable.Location = new System.Drawing.Point(8, 6);
             this.GSSolutionTable.Name = "GSSolutionTable";
             this.GSSolutionTable.ReadOnly = true;
-            this.GSSolutionTable.Size = new System.Drawing.Size(646, 378);
+            this.GSSolutionTable.Size = new System.Drawing.Size(483, 314);
             this.GSSolutionTable.TabIndex = 10;
             // 
             // saveFileDialog
@@ -688,18 +711,6 @@ namespace LabMethodOptimize
             // openFileDialog
             // 
             this.openFileDialog.Filter = "Text files (*.txt)|*.txt";
-            // 
-            // ABStepBackButton
-            // 
-            this.ABStepBackButton.Enabled = false;
-            this.ABStepBackButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
-            this.ABStepBackButton.Location = new System.Drawing.Point(776, 73);
-            this.ABStepBackButton.Name = "ABStepBackButton";
-            this.ABStepBackButton.Size = new System.Drawing.Size(211, 78);
-            this.ABStepBackButton.TabIndex = 15;
-            this.ABStepBackButton.Text = "Шаг Назад";
-            this.ABStepBackButton.UseVisualStyleBackColor = true;
-            this.ABStepBackButton.Click += new System.EventHandler(this.ABStepBackButton_Click);
             // 
             // Form1
             // 
@@ -791,6 +802,7 @@ namespace LabMethodOptimize
         private System.Windows.Forms.Button AllABStepButton;
         private System.Windows.Forms.Button SStepBackButton;
         private System.Windows.Forms.Button ABStepBackButton;
+        private System.Windows.Forms.Panel GraphicPanel;
     }
 }
 
