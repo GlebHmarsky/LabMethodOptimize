@@ -76,7 +76,7 @@ namespace LabMethodOptimize
             this.ABStepButton = new System.Windows.Forms.Button();
             this.ABSolverTable = new System.Windows.Forms.DataGridView();
             this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.GraphicPanel = new System.Windows.Forms.Panel();
+            this.GPanel = new System.Windows.Forms.Panel();
             this.GAnswerText = new System.Windows.Forms.TextBox();
             this.GSSolutionTable = new System.Windows.Forms.DataGridView();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
@@ -661,7 +661,7 @@ namespace LabMethodOptimize
             // tabPage4
             // 
             this.tabPage4.BackColor = System.Drawing.Color.Ivory;
-            this.tabPage4.Controls.Add(this.GraphicPanel);
+            this.tabPage4.Controls.Add(this.GPanel);
             this.tabPage4.Controls.Add(this.GAnswerText);
             this.tabPage4.Controls.Add(this.GSSolutionTable);
             this.tabPage4.Location = new System.Drawing.Point(4, 24);
@@ -671,14 +671,14 @@ namespace LabMethodOptimize
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Графический метод";
             // 
-            // GraphicPanel
+            // GPanel
             // 
-            this.GraphicPanel.BackColor = System.Drawing.Color.White;
-            this.GraphicPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.GraphicPanel.Location = new System.Drawing.Point(518, 6);
-            this.GraphicPanel.Name = "GraphicPanel";
-            this.GraphicPanel.Size = new System.Drawing.Size(785, 589);
-            this.GraphicPanel.TabIndex = 13;
+            this.GPanel.BackColor = System.Drawing.Color.White;
+            this.GPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.GPanel.Location = new System.Drawing.Point(518, 6);
+            this.GPanel.Name = "GPanel";
+            this.GPanel.Size = new System.Drawing.Size(785, 589);
+            this.GPanel.TabIndex = 13;
             // 
             // GAnswerText
             // 
@@ -802,7 +802,7 @@ namespace LabMethodOptimize
         private System.Windows.Forms.Button AllABStepButton;
         private System.Windows.Forms.Button SStepBackButton;
         private System.Windows.Forms.Button ABStepBackButton;
-        private System.Windows.Forms.Panel GraphicPanel;
+        private System.Windows.Forms.Panel GPanel;
     }
 }
 

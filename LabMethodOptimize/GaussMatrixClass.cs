@@ -25,6 +25,22 @@ namespace GaussMatrixClass
             RowCount = Row;
             ColumCount = Colum;
         }
+        public GaussMatrix(uint Size)
+        {
+            IndexListBasisElements = new List<int>();
+            RightPart = new Fraction[Size];
+
+            Matrix = new Fraction[Size][];
+            for (int i = 0; i < Size; i++)
+                Matrix[i] = new Fraction[Size];
+            RowCount = Size;
+            ColumCount = Size;
+
+            for (int i = 0; i < Size; i++)
+            {
+                IndexListBasisElements.Add(i);
+            }
+        }
 
         public int SolveMatrix()
         {

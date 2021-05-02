@@ -29,11 +29,11 @@ namespace LabMethodOptimize
         DataGridViewCellStyle AquamarineStyle = new DataGridViewCellStyle();
 
         List<SimplexSolver> MemoryOfSteps = new List<SimplexSolver>();
-
+        List<Fraction[]> lPoints = new List<Fraction[]>();
         public Form1()
         {
             this.Text = "Simplex Solver";
-            
+
             InitializeComponent();
             optimizationProblem.SelectedIndex = 0;
             fractionType.SelectedIndex = 0;
@@ -69,9 +69,8 @@ namespace LabMethodOptimize
 
         }
 
-        // План на день ;)
-        // BUG необходимо пофиксить окраску и выбор элементов для каждого метода по отдельности
-        // BUG !!!! файл: кр1 метод: симплекс базис: 1 3 5 
+        // План на день ;)    
+
         // ADD добвить проверку что строки функции и базиса заполнены(!) Формат можно не проверять, на это будем ругаться после.
         // Главное чтоб были для двух методов сделана проверка
         private void numericUpDownColumn_ValueChanged(object sender, EventArgs e)
@@ -630,7 +629,7 @@ namespace LabMethodOptimize
                     SSAnswerText.Text = str;
                     ActivateButtnosOnTab(0);
                 }
-                //ADD Посмотреть как тут записано и изменить в искуственном так же!
+
                 pivotIndex = SSolver.FindOptimalBearingElement();
                 SSolver.pivotIndex = pivotIndex;
                 MemoryOfSteps.Add(new SimplexSolver(SSolver));
@@ -658,8 +657,6 @@ namespace LabMethodOptimize
                 PrintResultToSoulutionGridView(GSSolutionTable, SSolver);
                 Make2DModel();
             }
-
-
         }
         private void ColorTheBearingEletemts(DataGridView WorkTable)
         {
@@ -764,7 +761,7 @@ namespace LabMethodOptimize
                 ActivateButtnosOnTab(0);
             }
 
-            //ADD Посмотреть как тут записано и изменить в искуственном так же!
+
             pivotIndex = SSolver.FindOptimalBearingElement();
             SSolver.pivotIndex = pivotIndex;
             MemoryOfSteps.Add(new SimplexSolver(SSolver));
@@ -1001,7 +998,6 @@ namespace LabMethodOptimize
         }
         private void ABStepBackButton_Click(object sender, EventArgs e)
         {
-            //ADD Это ещё далеко не всё! Т.к. шаг назад для искуственного несколько сложнее в связи с решением его.
             ABAnswerText.Text = "";
             ActivateButtnosOnTab(2);
             MemoryOfSteps.RemoveAt(MemoryOfSteps.Count - 1);//Удаляем последний
@@ -1055,6 +1051,98 @@ namespace LabMethodOptimize
         /*-------------------------------      GRAPHIC METHOD     ------------------------------*/
 
 
+        private bool CheckPoint(Fraction[] point)
+        {
+            //нужно подставить в симплекс таблицу эти самые точки и убедиться что неравеноство верно
+            Fraction res = new Fraction(0);
+            for (int i = 0; i < SSolver.RowCount; i++)
+            {
+                res += SSolver.RightPart[i];
+                for (int g = 0; g < SSolver.ColumCount; g++)
+                {
+                    res -= SSolver.Matrix[i][g] * point[g];
+                }
+
+                if (res < 0 || point[0] < 0 || point[1] < 0) //точка не подходит под ограничение
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        private void Find2DPoints()
+        {
+            GaussMatrix gm = new GaussMatrix(SSolver.ColumCount);
+            Fraction[] tmpPoint;
+            for (int i = 0; i < SSolver.RowCount; i++)
+            {
+                for (int g = i + 1; g < SSolver.RowCount; g++)
+                {
+                    //Нужно решить задачу гауссом,
+                    //и если тот вернёт ошибку, то значит прямые параллельны
+
+                    //Заполняем матрицу гаусса
+                    for (int j = 0; j < SSolver.ColumCount; j++)
+                    {
+                        gm.Matrix[0][j] = SSolver.Matrix[i][j];
+                        gm.Matrix[1][j] = SSolver.Matrix[g][j];
+                    }
+                    gm.RightPart[0] = SSolver.RightPart[i];
+                    gm.RightPart[1] = SSolver.RightPart[g];
+
+                    if (gm.SolveMatrix() > 0)
+                    {
+                        //Прямые парараллельны, просто пропускаем этот шаг
+                        continue;
+                    }
+                    //иначе записываем точку из правых частей
+                    tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
+                    if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
+                    {
+                        lPoints.Add(tmpPoint);
+                    }
+                }
+                //Найти пересечение с осями
+
+                /*-----------   С осью абцисс    ------------*/
+                for (int j = 0; j < SSolver.ColumCount; j++)
+                {
+                    gm.Matrix[0][j] = SSolver.Matrix[i][j];
+                }
+                gm.RightPart[0] = SSolver.RightPart[i];
+
+                gm.Matrix[1][0] = 0;
+                gm.Matrix[1][1] = 1;
+                gm.RightPart[1] = 0;
+
+                if (gm.SolveMatrix() > 0)//Прямые парараллельны, просто пропускаем этот шаг
+                    continue;
+
+                tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
+                if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
+                    lPoints.Add(tmpPoint);
+
+                /*-----------   С осью ординат   ------------*/
+                for (int j = 0; j < SSolver.ColumCount; j++)
+                {
+                    gm.Matrix[0][j] = SSolver.Matrix[i][j];
+                }
+                gm.RightPart[0] = SSolver.RightPart[i];
+
+                gm.Matrix[1][0] = 1;
+                gm.Matrix[1][1] = 0;
+                gm.RightPart[1] = 0;
+
+                if (gm.SolveMatrix() > 0)//Прямые парараллельны, просто пропускаем этот шаг
+                    continue;
+
+                tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
+                if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
+                    lPoints.Add(tmpPoint);
+
+            }
+        }
         private void Make2DModel()
         {
             /*
@@ -1066,9 +1154,73 @@ namespace LabMethodOptimize
              * 
              */
             SolidBrush bruh = new SolidBrush(Color.Red);
-            Graphics gr = this.GraphicPanel.CreateGraphics();
-            PaintEventArgs paintEvArgs = new PaintEventArgs(gr, this.GraphicPanel.ClientRectangle);
-            paintEvArgs.Graphics.FillRectangle(bruh, 50, 50, 200, 200);
+            Graphics gr = this.GPanel.CreateGraphics();
+            //PaintEventArgs paintEvArgs = new PaintEventArgs(gr, this.GPanel.ClientRectangle);
+            //paintEvArgs.Graphics.FillRectangle(bruh, 50, 50, 200, 200);
+
+            //Делаем все пересечения
+            //Веся эта функция рассчитана только на 2D!
+
+
+            //ADD !!!!! Переделать алгоритм и внести В него поиск границ и самого решения !!!!
+
+            Find2DPoints();
+            //после того как всё завершилось мы должны проверить что точки вообще есть
+            if (lPoints.Count == 0)
+            {
+                //Ругаемся что решений нет и выходим
+                ActivateButtnosOnTab(0);
+                GAnswerText.Text = "Нет решения для данной системы ограничения";
+                return;
+            }
+            //BUG А что если 1 точка???
+            //тогда можно сделать следующие - нам нужно найти 4 границы 
+            //2 по горизонтоли и 2 по вертикали
+            Fraction A, B, C, D; //предельные точки графика, дальше них рисовать нету смысла. (но мы всё равно будем :) )
+            A = B = lPoints[0][0];
+            C = D = lPoints[0][1];
+            foreach (Fraction[] point in lPoints)
+            {
+                if (A < point[0])
+                    A = point[0];
+                if (B > point[0])
+                    B = point[0];
+
+                if (C < point[1])
+                    C = point[1];
+                if (D > point[1])
+                    D = point[1];
+            }
+            //Нашли границы рисунка, но будем рисовать с отступом, чтобы картинка не была грубой
+
+            double offset = 5;
+            A -= offset;
+            B += offset;
+            C -= offset;
+            D += offset;
+            //TODO по умному задавать offset
+
+            Fraction[] leftPoint = new Fraction[2], rightPoint = new Fraction[2];
+            Pen pen = new Pen(bruh);
+
+            Point lp = new Point(), rp = new Point();
+            for (int i = 0; i < SSolver.RowCount; i++)
+            {
+                //Для каждого уравнения прямой рисуем эту прямую путём поиска 2 точек на концах панельки
+                leftPoint[0] = A;
+                rightPoint[0] = B;
+
+                leftPoint[1] = (SSolver.RightPart[i] - SSolver.Matrix[i][0] * leftPoint[0]) / SSolver.Matrix[i][1];
+                rightPoint[1] = (SSolver.RightPart[i] - SSolver.Matrix[i][0] * rightPoint[0]) / SSolver.Matrix[i][1];
+
+                lp.X = 0;
+                lp.Y = GPanel.Height - (int)(GPanel.Height * ((leftPoint[1] - C) / (D - C)).ToDouble());
+
+                rp.X = GPanel.Width;
+                rp.Y = GPanel.Height - (int)(GPanel.Height * ((rightPoint[1] - C) / (D - C)).ToDouble());
+
+                gr.DrawLine(pen, lp, rp);
+            }            
         }
 
 
@@ -1082,6 +1234,7 @@ namespace LabMethodOptimize
             if (StartRowForAnswerTable + SSolver.RowCount + 2 > countRowsInView) //Если таблица вылезает за границы отображения
             {
                 SSolutionTable.FirstDisplayedScrollingRowIndex = StartRowForAnswerTable - ((countRowsInView - (int)SSolver.RowCount + 2) / 2);
+                Update();
             }
 
             int countOfAddingRows = ((int)SSolver.RowCount + 2) + StartRowForAnswerTable - SSolutionTable.Rows.Count;
@@ -1089,7 +1242,7 @@ namespace LabMethodOptimize
             {
                 SSolutionTable.Rows.Add(countOfAddingRows);
             }
-            //Update();
+
 
             int i, g;
             SSolutionTable[0, StartRowForAnswerTable].Value = "X (" + SSolver.iteration.ToString() + ")";
