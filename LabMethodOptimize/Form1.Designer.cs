@@ -677,7 +677,7 @@ namespace LabMethodOptimize
             this.GPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.GPanel.Location = new System.Drawing.Point(518, 6);
             this.GPanel.Name = "GPanel";
-            this.GPanel.Size = new System.Drawing.Size(785, 589);
+            this.GPanel.Size = new System.Drawing.Size(600, 600);
             this.GPanel.TabIndex = 13;
             // 
             // GAnswerText

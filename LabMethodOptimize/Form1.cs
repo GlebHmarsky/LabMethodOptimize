@@ -30,6 +30,7 @@ namespace LabMethodOptimize
 
         List<SimplexSolver> MemoryOfSteps = new List<SimplexSolver>();
         List<Fraction[]> lPoints = new List<Fraction[]>();
+        Fraction A, B, C, D; //предельные точки графика, дальше них рисовать нету смысла. (но мы всё равно будем :) )
         public Form1()
         {
             this.Text = "Simplex Solver";
@@ -348,15 +349,14 @@ namespace LabMethodOptimize
                     break;
                 case -1: // Заблокировать Воообще все кнопки на форме
                     SStepBackButton.Enabled = false;
-                    ABStepButton.Enabled = false;
+                    ABStepBackButton.Enabled = false;
                     goto case 0;
                 case 0: // Заблокировать все
 
                     SStepButton.Enabled = false;
                     AllSStepButton.Enabled = false;
 
-
-                    ABStepBackButton.Enabled = false;
+                    ABStepButton.Enabled = false;                    
                     AllABStepButton.Enabled = false;
                     break;
             }
@@ -1173,10 +1173,11 @@ namespace LabMethodOptimize
                 GAnswerText.Text = "Нет решения для данной системы ограничения";
                 return;
             }
+
             //BUG А что если 1 точка???
             //тогда можно сделать следующие - нам нужно найти 4 границы 
             //2 по горизонтоли и 2 по вертикали
-            Fraction A, B, C, D; //предельные точки графика, дальше них рисовать нету смысла. (но мы всё равно будем :) )
+
             A = B = lPoints[0][0];
             C = D = lPoints[0][1];
             foreach (Fraction[] point in lPoints)
@@ -1200,6 +1201,10 @@ namespace LabMethodOptimize
             D += offset;
             //TODO по умному задавать offset
 
+
+            MakeMarkup();
+
+
             Fraction[] leftPoint = new Fraction[2], rightPoint = new Fraction[2];
             Pen pen = new Pen(bruh);
 
@@ -1220,9 +1225,64 @@ namespace LabMethodOptimize
                 rp.Y = GPanel.Height - (int)(GPanel.Height * ((rightPoint[1] - C) / (D - C)).ToDouble());
 
                 gr.DrawLine(pen, lp, rp);
-            }            
-        }
+            }
 
+        }
+        private void MakeMarkup()
+        {
+            Graphics gr = this.GPanel.CreateGraphics();
+            Font drawFont = new Font("Arial", 10);
+            Point lp = new Point(), rp = new Point();
+            Pen pen = new Pen(Color.LightGray, 2);
+            SolidBrush bruh = new SolidBrush(Color.Green);
+            int rpMax = (int)B.ToDouble();
+            if (rpMax < (int)D.ToDouble())
+                rpMax = (int)D.ToDouble();
+
+            rpMax++;
+
+            for (int i = (int)A.ToDouble(); i < rpMax; i++)
+            {
+                //ОСЬ АБЦИСС
+                lp.X = 0;
+                lp.Y = GPanel.Height - (int)(GPanel.Height * ((i - C) / (D - C)).ToDouble());
+                rp.X = GPanel.Width;
+                rp.Y = GPanel.Height - (int)(GPanel.Height * ((i - C) / (D - C)).ToDouble());
+                gr.DrawLine(pen, lp, rp);
+                lp.Offset(30, -10);
+                gr.DrawString(i.ToString(), drawFont, bruh, lp.X, lp.Y);
+            }
+            for (int i = (int)C.ToDouble(); i < rpMax; i++)
+            {
+
+                //ОСЬ ОРДИНАТ
+                lp.X = (int)(GPanel.Width * ((i - A) / (B - A)).ToDouble());
+                lp.Y = 0;
+                rp.X = (int)(GPanel.Width * ((i - A) / (B - A)).ToDouble());
+                rp.Y = GPanel.Height;
+                gr.DrawLine(pen, lp, rp);
+
+                lp.Offset(10, -30);
+                gr.DrawString(i.ToString(), drawFont, bruh, lp.X, lp.Y);
+            }
+
+            pen.Color = Color.Black;
+            //ОСЬ АБЦИСС
+            lp.X = 0;
+            lp.Y = GPanel.Height - (int)(GPanel.Height * ((0 - C) / (D - C)).ToDouble());
+            rp.X = GPanel.Width;
+            rp.Y = GPanel.Height - (int)(GPanel.Height * ((0 - C) / (D - C)).ToDouble());
+            gr.DrawLine(pen, lp, rp);
+
+            //ОСЬ ОРДИНАТ
+            lp.X = (int)(GPanel.Width * ((0 - A) / (B - A)).ToDouble());
+            lp.Y = 0;
+            rp.X = (int)(GPanel.Width * ((0 - A) / (B - A)).ToDouble());
+            rp.Y = GPanel.Height;
+            gr.DrawLine(pen, lp, rp);
+
+            //RX1 + ((RX2 - RX1) * ((x - A) / (B - A)));
+        }
 
         /*-------------------------------      PRINT TASKS     ------------------------------*/
 
