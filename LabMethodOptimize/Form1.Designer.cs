@@ -81,6 +81,7 @@ namespace LabMethodOptimize
             this.GSSolutionTable = new System.Windows.Forms.DataGridView();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.restrictionTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownColumn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRow)).BeginInit();
@@ -677,7 +678,7 @@ namespace LabMethodOptimize
             this.GPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.GPanel.Location = new System.Drawing.Point(518, 6);
             this.GPanel.Name = "GPanel";
-            this.GPanel.Size = new System.Drawing.Size(600, 600);
+            this.GPanel.Size = new System.Drawing.Size(850, 600);
             this.GPanel.TabIndex = 13;
             // 
             // GAnswerText
@@ -803,6 +804,7 @@ namespace LabMethodOptimize
         private System.Windows.Forms.Button SStepBackButton;
         private System.Windows.Forms.Button ABStepBackButton;
         private System.Windows.Forms.Panel GPanel;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 

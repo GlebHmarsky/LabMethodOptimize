@@ -30,7 +30,8 @@ namespace LabMethodOptimize
 
         List<SimplexSolver> MemoryOfSteps = new List<SimplexSolver>();
         List<Fraction[]> lPoints = new List<Fraction[]>();
-        Fraction A, B, C, D; //предельные точки графика, дальше них рисовать нету смысла. (но мы всё равно будем :) )
+        Fraction lA, lB, lC, lD; //предельные точки графика, дальше них рисовать нету смысла. (но мы всё равно будем :) )
+        Fraction gA, gB, gC, gD; // истинные пределы рисунка дальше которых рисунка ну точна даже мы рисовать не будем
         public Form1()
         {
             this.Text = "Simplex Solver";
@@ -356,7 +357,7 @@ namespace LabMethodOptimize
                     SStepButton.Enabled = false;
                     AllSStepButton.Enabled = false;
 
-                    ABStepButton.Enabled = false;                    
+                    ABStepButton.Enabled = false;
                     AllABStepButton.Enabled = false;
                     break;
             }
@@ -1050,14 +1051,15 @@ namespace LabMethodOptimize
 
         /*-------------------------------      GRAPHIC METHOD     ------------------------------*/
 
-
+        int indexOfOptimalPoint = -1;
+        Fraction valueOfSolution = null; //ADD обнулять эти переменные! 
         private bool CheckPoint(Fraction[] point)
         {
             //нужно подставить в симплекс таблицу эти самые точки и убедиться что неравеноство верно
             Fraction res = new Fraction(0);
             for (int i = 0; i < SSolver.RowCount; i++)
             {
-                res += SSolver.RightPart[i];
+                res = new Fraction(SSolver.RightPart[i]);
                 for (int g = 0; g < SSolver.ColumCount; g++)
                 {
                     res -= SSolver.Matrix[i][g] * point[g];
@@ -1070,6 +1072,39 @@ namespace LabMethodOptimize
             }
 
             return true;
+        }
+        private void Check2DPointForSolution(Fraction[] point)
+        {
+            Fraction res = new Fraction(0);
+            for (int i = 0; i < SSolver.ColumCount; i++)
+            {
+                res += SSolver.ObjFuncion[i] * point[i];
+            }
+            res -= SSolver.OFV;
+            if (valueOfSolution is null)
+            {
+                valueOfSolution = res;
+                indexOfOptimalPoint = lPoints.Count - 1;
+            }
+            else
+            {
+                if (optimizationProblem.SelectedIndex == 0)//задача на минимум
+                {
+                    if (valueOfSolution > res)
+                    {
+                        valueOfSolution = res;
+                        indexOfOptimalPoint = lPoints.Count - 1;
+                    }
+                }
+                else
+                {
+                    if (valueOfSolution < res)
+                    {
+                        valueOfSolution = res;
+                        indexOfOptimalPoint = lPoints.Count - 1;
+                    }
+                }
+            }
         }
         private void Find2DPoints()
         {
@@ -1101,6 +1136,7 @@ namespace LabMethodOptimize
                     if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
                     {
                         lPoints.Add(tmpPoint);
+                        Check2DPointForSolution(tmpPoint);
                     }
                 }
                 //Найти пересечение с осями
@@ -1116,13 +1152,15 @@ namespace LabMethodOptimize
                 gm.Matrix[1][1] = 1;
                 gm.RightPart[1] = 0;
 
-                if (gm.SolveMatrix() > 0)//Прямые парараллельны, просто пропускаем этот шаг
-                    continue;
-
-                tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
-                if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
-                    lPoints.Add(tmpPoint);
-
+                if (!(gm.SolveMatrix() > 0))//Прямые парараллельны, просто пропускаем этот шаг
+                {
+                    tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
+                    if (CheckPoint(tmpPoint))
+                    { //Точка подходит в ограничение
+                        lPoints.Add(tmpPoint);
+                        Check2DPointForSolution(tmpPoint);
+                    }
+                }
                 /*-----------   С осью ординат   ------------*/
                 for (int j = 0; j < SSolver.ColumCount; j++)
                 {
@@ -1134,14 +1172,78 @@ namespace LabMethodOptimize
                 gm.Matrix[1][1] = 0;
                 gm.RightPart[1] = 0;
 
-                if (gm.SolveMatrix() > 0)//Прямые парараллельны, просто пропускаем этот шаг
-                    continue;
-
-                tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
+                if (!(gm.SolveMatrix() > 0))//Прямые парараллельны, просто пропускаем этот шаг
+                {
+                    tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
+                    if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
+                    {
+                        lPoints.Add(tmpPoint);
+                        Check2DPointForSolution(tmpPoint);
+                    }
+                }
+                tmpPoint = new Fraction[2] { new Fraction(0), new Fraction(0) }; //Вписываем точку начала координат (пересечение осей)
                 if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
+                {
                     lPoints.Add(tmpPoint);
-
+                    Check2DPointForSolution(tmpPoint);
+                }
             }
+        }
+        private void MakeMarkup()
+        {
+            Graphics gr = this.GPanel.CreateGraphics();
+            Font drawFont = new Font("Arial", 10);
+            Point lp = new Point(), rp = new Point();
+            Pen pen = new Pen(Color.LightGray, 2);
+            SolidBrush bruh = new SolidBrush(Color.Green);
+
+            int rpMax = (int)gB.ToDouble();
+            if (rpMax < (int)gD.ToDouble())
+                rpMax = (int)gD.ToDouble();
+
+            rpMax++;
+            for (int i = (int)gA.ToDouble(); i < rpMax; i++)
+            {
+                // АБЦИССы                
+                lp.X = 0;
+                lp.Y = GPanel.Height - (int)(GPanel.Height * ((i - gC) / (gD - gC)).ToDouble());
+                rp.X = GPanel.Width;
+                rp.Y = GPanel.Height - (int)(GPanel.Height * ((i - gC) / (gD - gC)).ToDouble());
+                gr.DrawLine(pen, lp, rp);
+
+                lp.Offset(15, -20);
+                gr.DrawString(i.ToString(), drawFont, bruh, lp.X, lp.Y);
+            }
+            for (int i = (int)gC.ToDouble(); i < rpMax; i++)
+            {
+                // ОРДИНАТы                
+                lp.X = (int)(GPanel.Width * ((i - gA) / (gB - gA)).ToDouble());
+                lp.Y = GPanel.Height;
+                rp.X = (int)(GPanel.Width * ((i - gA) / (gB - gA)).ToDouble());
+                rp.Y = 0;
+                gr.DrawLine(pen, lp, rp);
+
+                lp.Offset(-20, -20);
+                gr.DrawString(i.ToString(), drawFont, bruh, lp.X, lp.Y);
+            }
+
+            pen.Color = Color.Black;
+            // ЖИРНАЯ ОСЬ АБЦИСС
+            lp.X = 0;
+            lp.Y = GPanel.Height - (int)(GPanel.Height * ((0 - gC) / (gD - gC)).ToDouble());
+            rp.X = GPanel.Width;
+            rp.Y = GPanel.Height - (int)(GPanel.Height * ((0 - gC) / (gD - gC)).ToDouble());
+            gr.DrawLine(pen, lp, rp);
+            lp.Offset(30, -10);
+            //gr.DrawString("0", drawFont, bruh, lp.X, lp.Y);
+            // ЖИРНАЯ ОСЬ ОРДИНАТ
+            lp.X = (int)(GPanel.Width * ((0 - gA) / (gB - gA)).ToDouble());
+            lp.Y = 0;
+            rp.X = (int)(GPanel.Width * ((0 - gA) / (gB - gA)).ToDouble());
+            rp.Y = GPanel.Height;
+            gr.DrawLine(pen, lp, rp);
+
+            //RX1 + ((RX2 - RX1) * ((x - A) / (B - A)));
         }
         private void Make2DModel()
         {
@@ -1164,7 +1266,10 @@ namespace LabMethodOptimize
 
             //ADD !!!!! Переделать алгоритм и внести В него поиск границ и самого решения !!!!
 
+
             Find2DPoints();
+
+
             //после того как всё завершилось мы должны проверить что точки вообще есть
             if (lPoints.Count == 0)
             {
@@ -1175,32 +1280,94 @@ namespace LabMethodOptimize
             }
 
             //BUG А что если 1 точка???
+
+            //выводим ответ
+            StringBuilder answer;
+            answer = new StringBuilder("x* (");
+
+            for (int i = 0; i < SSolver.RowCount + SSolver.ColumCount; i++)
+            {
+                Fraction res = new Fraction(0);
+                int indexOfIEl = -1;
+                if (SSolver.ILBasisEl.Contains(i))
+                {
+                    indexOfIEl = SSolver.ILBasisEl.IndexOf(i);
+                    res += SSolver.RightPart[indexOfIEl];
+                    for (int g = 0; g < SSolver.ColumCount; g++)
+                    {
+                        res -= SSolver.Matrix[indexOfIEl][g] * lPoints[indexOfOptimalPoint][g];
+                    }
+                    answer.Append($"{res}");
+                }
+                else
+                {
+                    indexOfIEl = SSolver.ILFreeEl.IndexOf(i);
+                    res = lPoints[indexOfOptimalPoint][indexOfIEl];
+                    answer.Append($"{res}");
+                }
+                answer.Append(", ");
+            }
+            answer.Length--;//Удаляем последний символ.
+            answer.Length--;
+            answer.Append(")");
+
+            answer.Append($"\r\n\nf(x*) = {valueOfSolution}");
+
+            GAnswerText.Text = answer.ToString();
+
+
             //тогда можно сделать следующие - нам нужно найти 4 границы 
             //2 по горизонтоли и 2 по вертикали
 
-            A = B = lPoints[0][0];
-            C = D = lPoints[0][1];
+            lA = lB = lPoints[0][0];
+            lC = lD = lPoints[0][1];
             foreach (Fraction[] point in lPoints)
             {
-                if (A < point[0])
-                    A = point[0];
-                if (B > point[0])
-                    B = point[0];
+                if (lA > point[0])
+                    lA = point[0];
+                if (lB < point[0])
+                    lB = point[0];
 
-                if (C < point[1])
-                    C = point[1];
-                if (D > point[1])
-                    D = point[1];
+                if (lC > point[1])
+                    lC = point[1];
+                if (lD < point[1])
+                    lD = point[1];
+
+                //параллельно будем искать самую высокую и самую низкую для прямой зарисовки точки
+
             }
             //Нашли границы рисунка, но будем рисовать с отступом, чтобы картинка не была грубой
 
-            double offset = 5;
-            A -= offset;
-            B += offset;
-            C -= offset;
-            D += offset;
-            //TODO по умному задавать offset
+            Fraction offset;
+            offset = (lB - lA) / 7;
 
+            //TODO тут нужно будет поменять всё как в тетрадочке ;)
+            gA = -offset;
+            gC = -offset;
+            gB = lB + offset;
+            gD = lD + offset;
+            if (GPanel.Width <= GPanel.Height)
+            {
+                if (gB - gA >= gD - gC)
+                {
+                    gD = ((gB - gA) / GPanel.Width) * GPanel.Height + gC;
+                }
+                else
+                {
+                    gB = ((gD - gC) / GPanel.Height) * GPanel.Width + gA;
+                }
+            }
+            else
+            {
+                if (gB - gA <= gD - gC)
+                {
+                    gD = ((gB - gA) / GPanel.Width) * GPanel.Height + gC;
+                }
+                else
+                {
+                    gB = ((gD - gC) / GPanel.Height) * GPanel.Width + gA;
+                }
+            }
 
             MakeMarkup();
 
@@ -1212,77 +1379,24 @@ namespace LabMethodOptimize
             for (int i = 0; i < SSolver.RowCount; i++)
             {
                 //Для каждого уравнения прямой рисуем эту прямую путём поиска 2 точек на концах панельки
-                leftPoint[0] = A;
-                rightPoint[0] = B;
+                leftPoint[0] = gA;
+                rightPoint[0] = gB;
 
                 leftPoint[1] = (SSolver.RightPart[i] - SSolver.Matrix[i][0] * leftPoint[0]) / SSolver.Matrix[i][1];
                 rightPoint[1] = (SSolver.RightPart[i] - SSolver.Matrix[i][0] * rightPoint[0]) / SSolver.Matrix[i][1];
 
                 lp.X = 0;
-                lp.Y = GPanel.Height - (int)(GPanel.Height * ((leftPoint[1] - C) / (D - C)).ToDouble());
+                lp.Y = GPanel.Height - (int)(GPanel.Height * ((leftPoint[1] - gC) / (gD - gC)).ToDouble());
 
                 rp.X = GPanel.Width;
-                rp.Y = GPanel.Height - (int)(GPanel.Height * ((rightPoint[1] - C) / (D - C)).ToDouble());
+                rp.Y = GPanel.Height - (int)(GPanel.Height * ((rightPoint[1] - gC) / (gD - gC)).ToDouble());
 
                 gr.DrawLine(pen, lp, rp);
             }
 
         }
-        private void MakeMarkup()
-        {
-            Graphics gr = this.GPanel.CreateGraphics();
-            Font drawFont = new Font("Arial", 10);
-            Point lp = new Point(), rp = new Point();
-            Pen pen = new Pen(Color.LightGray, 2);
-            SolidBrush bruh = new SolidBrush(Color.Green);
-            int rpMax = (int)B.ToDouble();
-            if (rpMax < (int)D.ToDouble())
-                rpMax = (int)D.ToDouble();
 
-            rpMax++;
 
-            for (int i = (int)A.ToDouble(); i < rpMax; i++)
-            {
-                //ОСЬ АБЦИСС
-                lp.X = 0;
-                lp.Y = GPanel.Height - (int)(GPanel.Height * ((i - C) / (D - C)).ToDouble());
-                rp.X = GPanel.Width;
-                rp.Y = GPanel.Height - (int)(GPanel.Height * ((i - C) / (D - C)).ToDouble());
-                gr.DrawLine(pen, lp, rp);
-                lp.Offset(30, -10);
-                gr.DrawString(i.ToString(), drawFont, bruh, lp.X, lp.Y);
-            }
-            for (int i = (int)C.ToDouble(); i < rpMax; i++)
-            {
-
-                //ОСЬ ОРДИНАТ
-                lp.X = (int)(GPanel.Width * ((i - A) / (B - A)).ToDouble());
-                lp.Y = 0;
-                rp.X = (int)(GPanel.Width * ((i - A) / (B - A)).ToDouble());
-                rp.Y = GPanel.Height;
-                gr.DrawLine(pen, lp, rp);
-
-                lp.Offset(10, -30);
-                gr.DrawString(i.ToString(), drawFont, bruh, lp.X, lp.Y);
-            }
-
-            pen.Color = Color.Black;
-            //ОСЬ АБЦИСС
-            lp.X = 0;
-            lp.Y = GPanel.Height - (int)(GPanel.Height * ((0 - C) / (D - C)).ToDouble());
-            rp.X = GPanel.Width;
-            rp.Y = GPanel.Height - (int)(GPanel.Height * ((0 - C) / (D - C)).ToDouble());
-            gr.DrawLine(pen, lp, rp);
-
-            //ОСЬ ОРДИНАТ
-            lp.X = (int)(GPanel.Width * ((0 - A) / (B - A)).ToDouble());
-            lp.Y = 0;
-            rp.X = (int)(GPanel.Width * ((0 - A) / (B - A)).ToDouble());
-            rp.Y = GPanel.Height;
-            gr.DrawLine(pen, lp, rp);
-
-            //RX1 + ((RX2 - RX1) * ((x - A) / (B - A)));
-        }
 
         /*-------------------------------      PRINT TASKS     ------------------------------*/
 
@@ -1418,7 +1532,7 @@ namespace LabMethodOptimize
     class DataReadException : Exception
     {
         public DataReadException(string message)
-            : base(message)
+       : base(message)
         { }
     }
 }

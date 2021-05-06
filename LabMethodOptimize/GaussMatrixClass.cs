@@ -49,7 +49,8 @@ namespace GaussMatrixClass
                 return 1; //Ошибка: неправильное количество базисных элементов 
             for (int i = 0; i < RowCount - 1; i++)// После этого цикла имеем матрицу у которой снизу диагонали нули
             {
-                SortRows(i); // позволяет вынести ненулевой элемент столбца вверх 
+                if (SortRows(i) > 0) // позволяет вынести ненулевой элемент столбца вверх 
+                    return 1; // ругаемся что у нас нулевой столбец
                 for (int j = i + 1; j < RowCount; j++)
                 {
 
@@ -103,16 +104,19 @@ namespace GaussMatrixClass
             return 0;
         }
 
-        private void SortRows(int SortIndex)// Метод, который поднимает строку с наибольшим числом выше.
+        private int SortRows(int SortIndex)// Метод, который поднимает строку с наибольшим числом выше. (конкртено тут используется для выноса ненулевого элемента вверх)
         {
-            Fraction MaxElement = Matrix[SortIndex][IndexListBasisElements[SortIndex]];
+            if (Matrix[SortIndex][IndexListBasisElements[SortIndex]] != 0)
+            {
+                return 0;
+            }
             int MaxElementIndex = SortIndex;
             for (int i = SortIndex + 1; i < RowCount; i++)
             {
-                if (Fraction.Abs(Matrix[i][IndexListBasisElements[SortIndex]]) > MaxElement)
+                if (Fraction.Abs(Matrix[i][IndexListBasisElements[SortIndex]]) != 0)
                 {
-                    MaxElement = Fraction.Abs(Matrix[i][IndexListBasisElements[SortIndex]]);
                     MaxElementIndex = i;
+                    break;
                 }
             }
 
@@ -132,7 +136,9 @@ namespace GaussMatrixClass
                     Matrix[MaxElementIndex][i] = Matrix[SortIndex][i];
                     Matrix[SortIndex][i] = Temp;
                 }
+                return 0;
             }
+            return 1;
         }
 
         public override String ToString()
