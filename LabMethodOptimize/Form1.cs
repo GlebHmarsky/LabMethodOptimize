@@ -1053,6 +1053,7 @@ namespace LabMethodOptimize
 
         int indexOfOptimalPoint = -1;
         Fraction valueOfSolution = null; //ADD обнулять эти переменные! 
+        //ADD проверять что точка не содежиться в списке и не добавить её случайно по второму разу
         private bool CheckPoint(Fraction[] point)
         {
             //нужно подставить в симплекс таблицу эти самые точки и убедиться что неравеноство верно
@@ -1181,12 +1182,12 @@ namespace LabMethodOptimize
                         Check2DPointForSolution(tmpPoint);
                     }
                 }
-                tmpPoint = new Fraction[2] { new Fraction(0), new Fraction(0) }; //Вписываем точку начала координат (пересечение осей)
-                if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
-                {
-                    lPoints.Add(tmpPoint);
-                    Check2DPointForSolution(tmpPoint);
-                }
+            }
+            tmpPoint = new Fraction[2] { new Fraction(0), new Fraction(0) }; //Вписываем точку начала координат (пересечение осей)
+            if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
+            {
+                lPoints.Add(tmpPoint);
+                Check2DPointForSolution(tmpPoint);
             }
         }
         private void MakeMarkup()
@@ -1315,33 +1316,51 @@ namespace LabMethodOptimize
 
             GAnswerText.Text = answer.ToString();
 
+            /*----   Зададим несколько параметров для прямой которая будет закрашивать нашу фигуру на плоскости    ----*/
+            int indexOfLeftPoint = 0;
+            int indexOfRightPoint = 0;
+            Fraction paramA, paramBForLeft, paramBForRight;
+
+            paramA = 3;
+            paramBForRight = paramBForLeft = lPoints[0][1] - paramA * lPoints[0][0];
 
             //тогда можно сделать следующие - нам нужно найти 4 границы 
             //2 по горизонтоли и 2 по вертикали
-
             lA = lB = lPoints[0][0];
             lC = lD = lPoints[0][1];
-            foreach (Fraction[] point in lPoints)
+            for (int i = 1; i < lPoints.Count; i++)
             {
-                if (lA > point[0])
-                    lA = point[0];
-                if (lB < point[0])
-                    lB = point[0];
+                if (lA > lPoints[i][0])
+                    lA = lPoints[i][0];
+                if (lB < lPoints[i][0])
+                    lB = lPoints[i][0];
 
-                if (lC > point[1])
-                    lC = point[1];
-                if (lD < point[1])
-                    lD = point[1];
+                if (lC > lPoints[i][1])
+                    lC = lPoints[i][1];
+                if (lD < lPoints[i][1])
+                    lD = lPoints[i][1];
 
                 //параллельно будем искать самую высокую и самую низкую для прямой зарисовки точки
-
+                if (lPoints[i][1] - paramA * lPoints[i][0] - paramBForLeft > 0)// точка выше текущей прямой
+                {
+                    indexOfLeftPoint = i;
+                    paramBForLeft = lPoints[i][1] - paramA * lPoints[i][0];
+                }
+                else if (lPoints[i][1] - paramA * lPoints[i][0] - paramBForRight < 0)//точка ниже 
+                {
+                    indexOfRightPoint = i;
+                    paramBForRight = lPoints[i][1] - paramA * lPoints[i][0];
+                }
             }
-            //Нашли границы рисунка, но будем рисовать с отступом, чтобы картинка не была грубой
+            
+            Fraction distance = Fraction.Abs(paramBForRight - paramBForLeft);
+            Fraction step = distance / 45; //знаменатель отвечает за количество линий при закраске
 
             Fraction offset;
             offset = (lB - lA) / 7;
 
-            //TODO тут нужно будет поменять всё как в тетрадочке ;)
+            //Нашли границы рисунка, но будем рисовать с отступом, чтобы картинка не была грубой
+            //TODO подумать и может всё таки изменить gA gC как в заметках 
             gA = -offset;
             gC = -offset;
             gB = lB + offset;
@@ -1393,7 +1412,92 @@ namespace LabMethodOptimize
 
                 gr.DrawLine(pen, lp, rp);
             }
+            pen.Color = Color.Aqua;
 
+            GaussMatrix gm = new GaussMatrix(SSolver.ColumCount);
+            Fraction[] tmpPoint;
+            List<Fraction[]> lPrintPoints = new List<Fraction[]>();
+            for (Fraction iter = step; iter < distance; iter += step)
+            {
+                //ADD написать тут норм алгоритм из заметок
+                for (int i = 0; i < SSolver.RowCount; i++)
+                {
+                    //Заполняем матрицу гаусса
+                    for (int j = 0; j < SSolver.ColumCount; j++)
+                    {
+                        gm.Matrix[0][j] = SSolver.Matrix[i][j];
+                    }
+                    gm.RightPart[0] = SSolver.RightPart[i];
+
+                    gm.Matrix[1][0] = -paramA;
+                    gm.Matrix[1][1] = 1;
+                    gm.RightPart[1] = paramBForLeft - iter;
+
+                    if (gm.SolveMatrix() > 0)
+                    {
+                        //Прямые парараллельны, просто пропускаем этот шаг
+                        continue;
+                    }
+                    //иначе записываем точку из правых частей
+                    tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
+                    if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
+                    {
+                        lPrintPoints.Add(tmpPoint);
+                    }
+
+                }
+                /*-----------   С осью абцисс    ------------*/
+                gm.Matrix[0][0] = 0;
+                gm.Matrix[0][1] = 1;
+                gm.RightPart[0] = 0;
+
+                gm.Matrix[1][0] = -paramA;
+                gm.Matrix[1][1] = 1;
+                gm.RightPart[1] = paramBForLeft - iter;
+
+                if (!(gm.SolveMatrix() > 0))//Прямые парараллельны, просто пропускаем этот шаг
+                {
+                    tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
+                    if (CheckPoint(tmpPoint))
+                    { //Точка подходит в ограничение
+                        lPrintPoints.Add(tmpPoint);
+                    }
+                }
+                /*-----------   С осью ординат   ------------*/
+                gm.Matrix[0][0] = 1;
+                gm.Matrix[0][1] = 0;
+                gm.RightPart[0] = 0;
+
+                gm.Matrix[1][0] = -paramA;
+                gm.Matrix[1][1] = 1;
+                gm.RightPart[1] = paramBForLeft - iter;
+
+                if (!(gm.SolveMatrix() > 0))//Прямые парараллельны, просто пропускаем этот шаг
+                {
+                    tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
+                    if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
+                    {
+                        lPrintPoints.Add(tmpPoint);
+                    }
+                }
+                
+
+                // Проверяем что у нас 2 точки
+                if (lPrintPoints.Count != 2)
+                {
+                    //у нас не 2 точки а следовательно - это плохо
+                    continue;
+                }
+                lp.X = (int)(GPanel.Width * ((lPrintPoints[0][0] - gA) / (gB - gA)).ToDouble());
+                lp.Y = GPanel.Height - (int)(GPanel.Height * ((lPrintPoints[0][1] - gC) / (gD - gC)).ToDouble());
+
+                rp.X = (int)(GPanel.Width * ((lPrintPoints[1][0] - gA) / (gB - gA)).ToDouble());
+                rp.Y = GPanel.Height - (int)(GPanel.Height * ((lPrintPoints[1][1] - gC) / (gD - gC)).ToDouble());
+
+                gr.DrawLine(pen, lp, rp);
+
+                lPrintPoints.Clear(); //очищаем список для следующих рисовашек
+            }
         }
 
 
