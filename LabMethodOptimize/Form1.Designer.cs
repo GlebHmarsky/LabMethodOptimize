@@ -81,7 +81,6 @@ namespace LabMethodOptimize
             this.GSSolutionTable = new System.Windows.Forms.DataGridView();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.restrictionTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownColumn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRow)).BeginInit();
@@ -175,7 +174,6 @@ namespace LabMethodOptimize
             this.MainMenu.Size = new System.Drawing.Size(1410, 24);
             this.MainMenu.TabIndex = 11;
             this.MainMenu.Text = "menuStrip1";
-            this.MainMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.MainMenu_ItemClicked);
             // 
             // fileToolStripMenuItem1
             // 
@@ -185,7 +183,6 @@ namespace LabMethodOptimize
             this.fileToolStripMenuItem1.Name = "fileToolStripMenuItem1";
             this.fileToolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem1.Text = "File";
-            this.fileToolStripMenuItem1.Click += new System.EventHandler(this.fileToolStripMenuItem1_Click);
             // 
             // openToolStripMenuItem
             // 
@@ -804,7 +801,6 @@ namespace LabMethodOptimize
         private System.Windows.Forms.Button SStepBackButton;
         private System.Windows.Forms.Button ABStepBackButton;
         private System.Windows.Forms.Panel GPanel;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 

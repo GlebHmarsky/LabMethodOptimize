@@ -32,6 +32,13 @@ namespace LabMethodOptimize
         List<Fraction[]> lPoints = new List<Fraction[]>();
         Fraction lA, lB, lC, lD; //предельные точки графика, дальше них рисовать нету смысла. (но мы всё равно будем :) )
         Fraction gA, gB, gC, gD; // истинные пределы рисунка дальше которых рисунка ну точна даже мы рисовать не будем
+        int indexOfOptimalPoint = -1;
+        Fraction valueOfSolution = null;
+
+
+        /*-------------------------------      INICIALIZE    ------------------------------*/
+
+
         public Form1()
         {
             this.Text = "Simplex Solver";
@@ -74,6 +81,7 @@ namespace LabMethodOptimize
         // План на день ;)    
 
         // ADD добвить проверку что строки функции и базиса заполнены(!) Формат можно не проверять, на это будем ругаться после.
+        // ADD сделать проверку что если введут плохой базис в графическом методе (или она не нужна?)
         // Главное чтоб были для двух методов сделана проверка
         private void numericUpDownColumn_ValueChanged(object sender, EventArgs e)
         {
@@ -491,6 +499,10 @@ namespace LabMethodOptimize
             GaussMatrix GaussMat = new GaussMatrix(RowCount, ColumCount);
             SSolver = new SimplexSolver(RowCount, ColumCount - RowCount);
 
+            indexOfOptimalPoint = -1;
+            valueOfSolution = null;
+
+
             if (RBSimplexMethod.Checked) // Симплекс
             {
                 SSolutionTable.Rows.Clear();
@@ -705,7 +717,9 @@ namespace LabMethodOptimize
                     {
                         if (SSolver.ILBasisEl.Contains(i))
                         {
-                            answer.Append(SSolver.RightPart[SSolver.ILBasisEl.IndexOf(i)].ToString());
+                            answer.Append(fractionType.SelectedIndex == 0 ?
+                                            SSolver.RightPart[SSolver.ILBasisEl.IndexOf(i)].ToString() :
+                                            SSolver.RightPart[SSolver.ILBasisEl.IndexOf(i)].ToDouble().ToString("0.000"));
                         }
                         else
                         {
@@ -715,8 +729,12 @@ namespace LabMethodOptimize
                     }
                     answer.Length--;//Удаляем последний символ.
                     answer.Append(")");
+                    if (optimizationProblem.SelectedIndex == 1)
+                        SSolver.OFV = -SSolver.OFV;
 
-                    answer.Append($"\r\n\nf(x*) = {(-SSolver.OFV).ToString()}");
+                    answer.Append($"\r\n\nf(x*) = " + (fractionType.SelectedIndex == 0 ?
+                                                    $"{-SSolver.OFV}" :
+                                                    $"{(-SSolver.OFV).ToDouble().ToString("0.000")}"));
 
                     /*SSTextAnswer.Text =*/
                     return answer.ToString();
@@ -1051,8 +1069,7 @@ namespace LabMethodOptimize
 
         /*-------------------------------      GRAPHIC METHOD     ------------------------------*/
 
-        int indexOfOptimalPoint = -1;
-        Fraction valueOfSolution = null; //ADD обнулять эти переменные! 
+
         //ADD проверять что точка не содежиться в списке и не добавить её случайно по второму разу
         private bool CheckPoint(Fraction[] point)
         {
@@ -1089,21 +1106,10 @@ namespace LabMethodOptimize
             }
             else
             {
-                if (optimizationProblem.SelectedIndex == 0)//задача на минимум
+                if (valueOfSolution > res)
                 {
-                    if (valueOfSolution > res)
-                    {
-                        valueOfSolution = res;
-                        indexOfOptimalPoint = lPoints.Count - 1;
-                    }
-                }
-                else
-                {
-                    if (valueOfSolution < res)
-                    {
-                        valueOfSolution = res;
-                        indexOfOptimalPoint = lPoints.Count - 1;
-                    }
+                    valueOfSolution = res;
+                    indexOfOptimalPoint = lPoints.Count - 1;
                 }
             }
         }
@@ -1262,10 +1268,8 @@ namespace LabMethodOptimize
             //paintEvArgs.Graphics.FillRectangle(bruh, 50, 50, 200, 200);
 
             //Делаем все пересечения
-            //Веся эта функция рассчитана только на 2D!
+            //Вся эта функция рассчитана только на 2D!
 
-
-            //ADD !!!!! Переделать алгоритм и внести В него поиск границ и самого решения !!!!
 
 
             Find2DPoints();
@@ -1298,12 +1302,14 @@ namespace LabMethodOptimize
                     {
                         res -= SSolver.Matrix[indexOfIEl][g] * lPoints[indexOfOptimalPoint][g];
                     }
+                    res = fractionType.SelectedIndex == 0 ? res : res.ToDouble();
                     answer.Append($"{res}");
                 }
                 else
                 {
                     indexOfIEl = SSolver.ILFreeEl.IndexOf(i);
                     res = lPoints[indexOfOptimalPoint][indexOfIEl];
+                    res = fractionType.SelectedIndex == 0 ? res : res.ToDouble();
                     answer.Append($"{res}");
                 }
                 answer.Append(", ");
@@ -1311,8 +1317,10 @@ namespace LabMethodOptimize
             answer.Length--;//Удаляем последний символ.
             answer.Length--;
             answer.Append(")");
+            if (optimizationProblem.SelectedIndex == 1)
+                valueOfSolution = -valueOfSolution;
 
-            answer.Append($"\r\n\nf(x*) = {valueOfSolution}");
+            answer.Append($"\r\n\nf(x*) = " + (fractionType.SelectedIndex == 0 ? $"{valueOfSolution}" : $"{valueOfSolution.ToDouble()}"));
 
             GAnswerText.Text = answer.ToString();
 
@@ -1352,7 +1360,7 @@ namespace LabMethodOptimize
                     paramBForRight = lPoints[i][1] - paramA * lPoints[i][0];
                 }
             }
-            
+
             Fraction distance = Fraction.Abs(paramBForRight - paramBForLeft);
             Fraction step = distance / 45; //знаменатель отвечает за количество линий при закраске
 
@@ -1419,7 +1427,6 @@ namespace LabMethodOptimize
             List<Fraction[]> lPrintPoints = new List<Fraction[]>();
             for (Fraction iter = step; iter < distance; iter += step)
             {
-                //ADD написать тут норм алгоритм из заметок
                 for (int i = 0; i < SSolver.RowCount; i++)
                 {
                     //Заполняем матрицу гаусса
@@ -1480,7 +1487,7 @@ namespace LabMethodOptimize
                         lPrintPoints.Add(tmpPoint);
                     }
                 }
-                
+
 
                 // Проверяем что у нас 2 точки
                 if (lPrintPoints.Count != 2)
@@ -1499,7 +1506,6 @@ namespace LabMethodOptimize
                 lPrintPoints.Clear(); //очищаем список для следующих рисовашек
             }
         }
-
 
 
         /*-------------------------------      PRINT TASKS     ------------------------------*/
@@ -1537,17 +1543,25 @@ namespace LabMethodOptimize
                 SSolutionTable[0, i + StartRowForAnswerTable].Value = "X" + (SSolver.ILBasisEl[i] + 1).ToString();
                 for (g = 0; g < SSolver.ColumCount; g++)
                 {
-                    SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = SSolver.Matrix[i][g].ToString();
+                    SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = fractionType.SelectedIndex == 0 ?
+                                                                                SSolver.Matrix[i][g].ToString() :
+                                                                                SSolver.Matrix[i][g].ToDouble().ToString();
                 }
-                SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = SSolver.RightPart[i].ToString();
+                SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = fractionType.SelectedIndex == 0 ?
+                                                                            SSolver.RightPart[i].ToString() :
+                                                                            SSolver.RightPart[i].ToDouble().ToString();
             }
 
 
             for (g = 0; g < SSolver.ColumCount; g++)
             {
-                SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = SSolver.ObjFuncion[g].ToString();
+                SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = fractionType.SelectedIndex == 0 ?
+                                                                            SSolver.ObjFuncion[g].ToString() :
+                                                                            SSolver.ObjFuncion[g].ToDouble().ToString();
             }
-            SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = SSolver.OFV.ToString();
+            SSolutionTable[g + 1, i + StartRowForAnswerTable].Value = fractionType.SelectedIndex == 0 ?
+                                                                            SSolver.OFV.ToString() :
+                                                                            SSolver.OFV.ToDouble().ToString();
 
             StartRowForAnswerTable += i + 2;
         }
@@ -1583,7 +1597,6 @@ namespace LabMethodOptimize
             BeginSolve.Enabled = true;
         }
 
-
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
             if (!RBSimplexMethod.Checked) return;
@@ -1606,17 +1619,6 @@ namespace LabMethodOptimize
             basicVariablesTable.Visible = true;
             BeginSolve.Enabled = true;
         }
-
-        private void MainMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
-        }
-
-        private void fileToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-
-        }
-
 
         private void fractionType_SelectedIndexChanged(object sender, EventArgs e)
         {
