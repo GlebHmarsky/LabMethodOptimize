@@ -17,7 +17,7 @@ namespace SimplexSolverClass
         public bool isArtificialTask { get; set; }
         public Fraction[][] Matrix { get; set; }
         public Fraction[] RightPart { get; set; }
-        public Fraction[] ObjFuncion { get; set; }
+        public Fraction[] ObjFunction { get; set; }
         public List<int> ILBasisEl { get; set; }
         public List<int> ILFreeEl { get; set; }
         public Fraction OFV { get; set; }
@@ -37,7 +37,7 @@ namespace SimplexSolverClass
                 Matrix[i] = new Fraction[Colum];
 
             RightPart = new Fraction[Row];
-            ObjFuncion = new Fraction[Colum];
+            ObjFunction = new Fraction[Colum];
 
             OFV = new Fraction(0);
 
@@ -58,7 +58,7 @@ namespace SimplexSolverClass
             Matrix = ss.Matrix;
 
             RightPart = ss.RightPart;
-            ObjFuncion = ss.ObjFuncion;
+            ObjFunction = ss.ObjFunction;
 
             OFV = new Fraction(ss.OFV);
 
@@ -103,8 +103,8 @@ namespace SimplexSolverClass
                     Result += (-Matrix[g][i]) * initObjFunc[ILBasisEl[g]];
                 }
 
-                if (fFindMax) ObjFuncion[i] = -(Result + initObjFunc[ILFreeEl[i]]);
-                else ObjFuncion[i] = Result + initObjFunc[ILFreeEl[i]];
+                if (fFindMax) ObjFunction[i] = -(Result + initObjFunc[ILFreeEl[i]]);
+                else ObjFunction[i] = Result + initObjFunc[ILFreeEl[i]];
             }
         }
         public void CalculateObjectiveFunctionValue(List<Fraction> initObjFunc, bool fFindMax)
@@ -129,7 +129,7 @@ namespace SimplexSolverClass
                 indexBasisEl = -1;
 
                 Fraction MinEl = new Fraction(-1);
-                if (ObjFuncion[i] < 0) //то пробежаться по столбцу и найти те* самые элементы.
+                if (ObjFunction[i] < 0) //то пробежаться по столбцу и найти те* самые элементы.
                 {
                     indexFreeEl = i; //запоминаем столбец где есть отрицательный элемент снизу
                     //Нужно найти подходящий минимальный элемент. 
@@ -233,7 +233,7 @@ namespace SimplexSolverClass
                 if (i == iRow) continue;
                 NewMatrix[i][iColum] = -(Matrix[i][iColum] / Matrix[iRow][iColum]);
             }
-            NewObjFuncion[iColum] = -(ObjFuncion[iColum] / Matrix[iRow][iColum]);
+            NewObjFuncion[iColum] = -(ObjFunction[iColum] / Matrix[iRow][iColum]);
             // 4
             Fraction MultiplyEl = new Fraction(0);
             for (int i = 0; i < RowCount; i++)
@@ -249,17 +249,17 @@ namespace SimplexSolverClass
             }
 
             //Для нижней строки
-            MultiplyEl = ObjFuncion[iColum];
+            MultiplyEl = ObjFunction[iColum];
             for (int g = 0; g < ColumCount; g++)
             {
                 if (g == iColum) continue;
-                NewObjFuncion[g] = ObjFuncion[g] - (NewMatrix[iRow][g] * MultiplyEl);
+                NewObjFuncion[g] = ObjFunction[g] - (NewMatrix[iRow][g] * MultiplyEl);
             }
             NewOFV = OFV - (NewRightPart[iRow] * MultiplyEl);
 
             Matrix = NewMatrix;
             RightPart = NewRightPart;
-            ObjFuncion = NewObjFuncion;
+            ObjFunction = NewObjFuncion;
             OFV = NewOFV;
             bearingEls.Clear();//Списко опорных элементов изменился для новой таблицы, поэтому его нужно перестраивать.
             iteration++;
@@ -275,13 +275,13 @@ namespace SimplexSolverClass
                 return -1; //Нету элементов для поиска.
             }
             int optimalIndex = 0;
-            Fraction MaxEl = Fraction.Abs(ObjFuncion[bearingEls[0][1]]); //Кладём максимальный по модулю элемент в опорном столбце из целевой функции
+            Fraction MaxEl = Fraction.Abs(ObjFunction[bearingEls[0][1]]); //Кладём максимальный по модулю элемент в опорном столбце из целевой функции
             for (int i = 1; i < bearingEls.Count; i++)
             {
-                if (MaxEl < Fraction.Abs(ObjFuncion[bearingEls[i][1]]))
+                if (MaxEl < Fraction.Abs(ObjFunction[bearingEls[i][1]]))
                 {
                     optimalIndex = i;
-                    MaxEl = Fraction.Abs(ObjFuncion[bearingEls[i][1]]);
+                    MaxEl = Fraction.Abs(ObjFunction[bearingEls[i][1]]);
                 }
             }
             return optimalIndex;
@@ -312,13 +312,13 @@ namespace SimplexSolverClass
                 {
                     NewMatrix[i][g - offset] = Matrix[i][g];
                 }
-                NewObjFunction[g - offset] = ObjFuncion[g];
+                NewObjFunction[g - offset] = ObjFunction[g];
             }
 
             ColumCount--;
             ILFreeEl.RemoveAt(indexToDelete);
             Matrix = NewMatrix;
-            ObjFuncion = NewObjFunction;
+            ObjFunction = NewObjFunction;
 
         }
 
