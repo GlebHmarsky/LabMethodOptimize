@@ -30,12 +30,19 @@ namespace LabMethodOptimize
 
         List<SimplexSolver> MemoryOfSteps = new List<SimplexSolver>();
         List<Fraction[]> lPoints = new List<Fraction[]>();
-        Fraction lA, lB, lC, lD; //предельные точки графика, дальше них рисовать нету смысла. (но мы всё равно будем :) )
+        Fraction lA, lB, lC, lD; // предельные точки графика, дальше них рисовать нету смысла. (но мы всё равно будем :) )
         Fraction gA, gB, gC, gD; // истинные пределы рисунка дальше которых рисунка ну точна даже мы рисовать не будем
+        Fraction sA, sB, sC, sD; // Переменные для масштабирования рисунка а так же 
         int indexOfOptimalPoint = -1;
         Fraction valueOfSolution = null;
 
-
+        Fraction offset;
+        Fraction paramA, paramBForLeft, paramBForRight;
+        Fraction distance;
+        Fraction step;
+        bool fTaskIsLimited = true;
+        bool fCanDraw = false;
+        bool fItsAScaleFunc = false;
         /*-------------------------------      INICIALIZE    ------------------------------*/
 
 
@@ -44,6 +51,8 @@ namespace LabMethodOptimize
             this.Text = "Simplex Solver";
 
             InitializeComponent();
+            this.GPanel.MouseWheel += GPanel_MouseWheel;
+
             optimizationProblem.SelectedIndex = 0;
             fractionType.SelectedIndex = 0;
             RBSimplexMethod.Checked = true;
@@ -77,6 +86,8 @@ namespace LabMethodOptimize
 
 
         }
+
+
 
         // План на день ;)    
 
@@ -481,9 +492,15 @@ namespace LabMethodOptimize
             MemoryOfSteps.Clear();
             ActivateButtnosOnTab(0);
 
-            //TODO Не помешали бы провеки на эти самые переменные прямо тут ;)
+            fCanDraw = false;
+
             RowCount = (uint)numericUpDownRow.Value;
             ColumCount = (uint)numericUpDownColumn.Value;
+            if (RowCount == 0 || ColumCount == 0)
+            {
+                return;
+            }
+
             if (RowCount > ColumCount)
             {
                 //ругаемся и выходим сразу же
@@ -548,6 +565,7 @@ namespace LabMethodOptimize
             {
                 GSSolutionTable.Rows.Clear();
                 GAnswerText.Text = "";
+                lPoints.Clear();
 
                 ActivateButtnosOnTab(3);
 
@@ -664,7 +682,7 @@ namespace LabMethodOptimize
             }
             else if (RBGraphic.Checked)
             {
-                PrintResultToSoulutionGridView(GSSolutionTable, SSolver); //Вывод ограничений сделан несколько красивее чем обыная симплекс таблица
+                //PrintResultToSoulutionGridView(GSSolutionTable, SSolver); //Вывод ограничений сделан несколько красивее чем обыная симплекс таблица
                 Make2DModel();
             }
         }
@@ -766,7 +784,71 @@ namespace LabMethodOptimize
             BeginSolve.PerformClick();
 
         }
+        private void GPanel_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (!fCanDraw)
+                return;
 
+            int zoomFactor = 5;
+
+            if (e.Delta > 0) //Колесо покрутилось наверх
+            {
+                if (Fraction.Abs(gA + Fraction.Abs(sA / zoomFactor)) == Fraction.Abs(sA))
+                {
+                    return;
+                }
+                //Приближаем рисунок - но не больше чем минимальное расстояние в виде
+                if (Fraction.Abs(gA + Fraction.Abs(sA / zoomFactor)) < Fraction.Abs(sA))
+                {
+                    gA = sA;
+                    gC = sC;
+                    gB = sB;
+                    gD = sD;
+                }
+                else
+                {
+                    gA += Fraction.Abs(sA / zoomFactor);
+                    gC += Fraction.Abs(sC / zoomFactor);
+                    gB -= Fraction.Abs(sB / zoomFactor);
+                    gD -= Fraction.Abs(sD / zoomFactor);
+                }
+            }
+            else
+            {
+                if (Fraction.Abs(gA - Fraction.Abs(sA / zoomFactor)) == Fraction.Abs(sA) * 3)
+                {
+                    return;
+                }
+                //Иначе отдаляем
+                if (Fraction.Abs(gA - Fraction.Abs(sA / zoomFactor)) > Fraction.Abs(sA) * 3)
+                {
+                    gA = sA * 3;
+                    gC = sC * 3;
+                    gB = sB * 3;
+                    gD = sD * 3;
+                }
+                else
+                {
+                    gA -= Fraction.Abs(sA / zoomFactor);
+                    gC -= Fraction.Abs(sC / zoomFactor);
+                    gB += Fraction.Abs(sB / zoomFactor);
+                    gD += Fraction.Abs(sD / zoomFactor);
+                }
+            }
+
+            fItsAScaleFunc = true; //Чтобы Paint не рисовал по второму разу 
+            GPanel.Refresh();
+            Draw2D();
+            fItsAScaleFunc = false;
+        }
+        private void GPanel_Paint(object sender, PaintEventArgs e)
+        {
+            if (fItsAScaleFunc)
+            {
+                return;
+            }
+            Draw2D();
+        }
 
         /*-------------------------------      SIMPLEX METHOD     ------------------------------*/
 
@@ -1313,8 +1395,7 @@ namespace LabMethodOptimize
              * можно будет определить границы самого графика путём поиска 4 границ в виде прямоугольника.
              * 
              */
-            SolidBrush bruh = new SolidBrush(Color.Red);
-            Graphics gr = this.GPanel.CreateGraphics();
+
 
             WriteAllRestrictionsAndObjFunc();
 
@@ -1339,7 +1420,7 @@ namespace LabMethodOptimize
              * ругаться что наша функция не ограничена и следовательной всё плохо             * 
              *
              */
-            bool fTaskIsLimited = true;
+            fTaskIsLimited = true;
             Fraction[] posibleOptimalPoint = new Fraction[2];
             Fraction OldValue;
             for (int i = 0; i < SSolver.RowCount; i++)
@@ -1402,7 +1483,7 @@ namespace LabMethodOptimize
             /*----   Зададим несколько параметров для прямой которая будет закрашивать нашу фигуру на плоскости    ----*/
             int indexOfLeftPoint = 0;
             int indexOfRightPoint = 0;
-            Fraction paramA, paramBForLeft, paramBForRight;
+
 
             paramA = 3;
             paramBForRight = paramBForLeft = lPoints[0][1] - paramA * lPoints[0][0];
@@ -1436,10 +1517,10 @@ namespace LabMethodOptimize
                 }
             }
 
-            Fraction distance = Fraction.Abs(paramBForRight - paramBForLeft);
-            Fraction step = distance / 45; //знаменатель отвечает за количество линий при закраске
+            distance = Fraction.Abs(paramBForRight - paramBForLeft);
+            step = distance / 45; //знаменатель отвечает за количество линий при закраске
 
-            Fraction offset;
+
             offset = (lB - lA) / 7;
 
             //Нашли границы рисунка, но будем рисовать с отступом, чтобы картинка не была грубой
@@ -1458,6 +1539,22 @@ namespace LabMethodOptimize
                 gB = ((gD - gC) / GPanel.Height) * GPanel.Width + gA;
             }
 
+            //Сохраним первоначальные значения границ рисунка и после позволим их себе портить
+            sA = new Fraction(gA);
+            sB = new Fraction(gB);
+            sC = new Fraction(gC);
+            sD = new Fraction(gD);
+            fCanDraw = true;
+            Draw2D();
+        }
+
+        /*-------------     НАЧАЛО ВСЕГО РИСОВАНИЯ     -------------*/
+        void Draw2D()
+        {
+            if (!fCanDraw)
+                return;
+            SolidBrush bruh = new SolidBrush(Color.Red);
+            Graphics gr = this.GPanel.CreateGraphics();
             MakeMarkup();
 
 
@@ -1577,7 +1674,7 @@ namespace LabMethodOptimize
             float Radius = 17;
             if (fTaskIsLimited)
                 gr.DrawEllipse(pen, lp.X - Radius / 2, lp.Y - Radius / 2, Radius, Radius);
-            lPoints.Clear();
+
 
             /*-------------     РИСУЕМ ПРЯМУЮ СОБ. ФУНКЦИИ     -------------*/
             pen.Color = Color.DarkGreen;

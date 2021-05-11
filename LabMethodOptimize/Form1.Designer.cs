@@ -88,7 +88,6 @@ namespace LabMethodOptimize
             this.GSSolutionTable = new System.Windows.Forms.DataGridView();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.RefreshButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.restrictionTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownColumn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRow)).BeginInit();
@@ -179,7 +178,7 @@ namespace LabMethodOptimize
             this.aboutToolStripMenuItem});
             this.MainMenu.Location = new System.Drawing.Point(0, 0);
             this.MainMenu.Name = "MainMenu";
-            this.MainMenu.Size = new System.Drawing.Size(1410, 24);
+            this.MainMenu.Size = new System.Drawing.Size(1250, 24);
             this.MainMenu.TabIndex = 11;
             this.MainMenu.Text = "menuStrip1";
             // 
@@ -223,7 +222,7 @@ namespace LabMethodOptimize
             this.tabControl.Location = new System.Drawing.Point(0, 27);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(1400, 800);
+            this.tabControl.Size = new System.Drawing.Size(1242, 646);
             this.tabControl.TabIndex = 12;
             // 
             // tabPage1
@@ -249,7 +248,7 @@ namespace LabMethodOptimize
             this.tabPage1.Location = new System.Drawing.Point(4, 24);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1392, 772);
+            this.tabPage1.Size = new System.Drawing.Size(1234, 618);
             this.tabPage1.TabIndex = 2;
             this.tabPage1.Text = "Условия задачи";
             // 
@@ -447,7 +446,7 @@ namespace LabMethodOptimize
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1392, 772);
+            this.tabPage2.Size = new System.Drawing.Size(1234, 618);
             this.tabPage2.TabIndex = 4;
             this.tabPage2.Text = "Симплекс метод";
             // 
@@ -456,7 +455,7 @@ namespace LabMethodOptimize
             this.textBox14.BackColor = System.Drawing.Color.Ivory;
             this.textBox14.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox14.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.textBox14.Location = new System.Drawing.Point(832, 285);
+            this.textBox14.Location = new System.Drawing.Point(470, 469);
             this.textBox14.Name = "textBox14";
             this.textBox14.ReadOnly = true;
             this.textBox14.Size = new System.Drawing.Size(72, 23);
@@ -466,9 +465,10 @@ namespace LabMethodOptimize
             // SStepBackButton
             // 
             this.SStepBackButton.Enabled = false;
-            this.SStepBackButton.Location = new System.Drawing.Point(832, 19);
+            this.SStepBackButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.SStepBackButton.Location = new System.Drawing.Point(840, 90);
             this.SStepBackButton.Name = "SStepBackButton";
-            this.SStepBackButton.Size = new System.Drawing.Size(211, 78);
+            this.SStepBackButton.Size = new System.Drawing.Size(150, 70);
             this.SStepBackButton.TabIndex = 8;
             this.SStepBackButton.Text = "Шаг назад";
             this.SStepBackButton.UseVisualStyleBackColor = true;
@@ -477,9 +477,10 @@ namespace LabMethodOptimize
             // AllSStepButton
             // 
             this.AllSStepButton.Enabled = false;
-            this.AllSStepButton.Location = new System.Drawing.Point(832, 187);
+            this.AllSStepButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.AllSStepButton.Location = new System.Drawing.Point(840, 300);
             this.AllSStepButton.Name = "AllSStepButton";
-            this.AllSStepButton.Size = new System.Drawing.Size(211, 78);
+            this.AllSStepButton.Size = new System.Drawing.Size(150, 70);
             this.AllSStepButton.TabIndex = 7;
             this.AllSStepButton.Text = "Решить до конца";
             this.AllSStepButton.UseVisualStyleBackColor = true;
@@ -488,29 +489,31 @@ namespace LabMethodOptimize
             // textBox9
             // 
             this.textBox9.BackColor = System.Drawing.Color.Ivory;
+            this.textBox9.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox9.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.textBox9.Location = new System.Drawing.Point(565, 515);
+            this.textBox9.Location = new System.Drawing.Point(40, 508);
             this.textBox9.Name = "textBox9";
             this.textBox9.ReadOnly = true;
-            this.textBox9.Size = new System.Drawing.Size(256, 24);
+            this.textBox9.Size = new System.Drawing.Size(256, 17);
             this.textBox9.TabIndex = 6;
             this.textBox9.Text = "Выбранный опорный элемент";
             // 
             // textBox5
             // 
             this.textBox5.BackColor = System.Drawing.Color.Ivory;
+            this.textBox5.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.textBox5.Location = new System.Drawing.Point(565, 471);
+            this.textBox5.Location = new System.Drawing.Point(40, 464);
             this.textBox5.Name = "textBox5";
             this.textBox5.ReadOnly = true;
-            this.textBox5.Size = new System.Drawing.Size(256, 24);
+            this.textBox5.Size = new System.Drawing.Size(256, 17);
             this.textBox5.TabIndex = 5;
             this.textBox5.Text = "Возможный опорный элемент";
             // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.LightCoral;
-            this.panel2.Location = new System.Drawing.Point(533, 515);
+            this.panel2.Location = new System.Drawing.Point(8, 505);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(26, 24);
             this.panel2.TabIndex = 4;
@@ -518,7 +521,7 @@ namespace LabMethodOptimize
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Aquamarine;
-            this.panel1.Location = new System.Drawing.Point(533, 472);
+            this.panel1.Location = new System.Drawing.Point(8, 462);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(26, 23);
             this.panel1.TabIndex = 3;
@@ -527,7 +530,7 @@ namespace LabMethodOptimize
             // 
             this.SSAnswerText.BackColor = System.Drawing.Color.OldLace;
             this.SSAnswerText.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.SSAnswerText.Location = new System.Drawing.Point(910, 285);
+            this.SSAnswerText.Location = new System.Drawing.Point(548, 469);
             this.SSAnswerText.Multiline = true;
             this.SSAnswerText.Name = "SSAnswerText";
             this.SSAnswerText.ReadOnly = true;
@@ -537,9 +540,10 @@ namespace LabMethodOptimize
             // SStepButton
             // 
             this.SStepButton.Enabled = false;
-            this.SStepButton.Location = new System.Drawing.Point(832, 103);
+            this.SStepButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
+            this.SStepButton.Location = new System.Drawing.Point(840, 195);
             this.SStepButton.Name = "SStepButton";
-            this.SStepButton.Size = new System.Drawing.Size(211, 78);
+            this.SStepButton.Size = new System.Drawing.Size(150, 70);
             this.SStepButton.TabIndex = 1;
             this.SStepButton.Text = "Симплекс шаг";
             this.SStepButton.UseVisualStyleBackColor = true;
@@ -555,7 +559,7 @@ namespace LabMethodOptimize
             this.SSolutionTable.Location = new System.Drawing.Point(8, 6);
             this.SSolutionTable.Name = "SSolutionTable";
             this.SSolutionTable.ReadOnly = true;
-            this.SSolutionTable.Size = new System.Drawing.Size(794, 429);
+            this.SSolutionTable.Size = new System.Drawing.Size(800, 450);
             this.SSolutionTable.TabIndex = 0;
             this.SSolutionTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SSolverTable_CellClick);
             // 
@@ -575,7 +579,7 @@ namespace LabMethodOptimize
             this.tabPage3.Location = new System.Drawing.Point(4, 24);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1392, 772);
+            this.tabPage3.Size = new System.Drawing.Size(1234, 618);
             this.tabPage3.TabIndex = 5;
             this.tabPage3.Text = "Метод искуственного базиса";
             // 
@@ -584,7 +588,7 @@ namespace LabMethodOptimize
             this.textBox13.BackColor = System.Drawing.Color.Ivory;
             this.textBox13.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox13.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.textBox13.Location = new System.Drawing.Point(776, 356);
+            this.textBox13.Location = new System.Drawing.Point(470, 469);
             this.textBox13.Name = "textBox13";
             this.textBox13.ReadOnly = true;
             this.textBox13.Size = new System.Drawing.Size(72, 23);
@@ -595,11 +599,11 @@ namespace LabMethodOptimize
             // 
             this.ABStepBackButton.Enabled = false;
             this.ABStepBackButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
-            this.ABStepBackButton.Location = new System.Drawing.Point(776, 73);
+            this.ABStepBackButton.Location = new System.Drawing.Point(840, 90);
             this.ABStepBackButton.Name = "ABStepBackButton";
-            this.ABStepBackButton.Size = new System.Drawing.Size(211, 78);
+            this.ABStepBackButton.Size = new System.Drawing.Size(150, 70);
             this.ABStepBackButton.TabIndex = 15;
-            this.ABStepBackButton.Text = "Шаг Назад";
+            this.ABStepBackButton.Text = "Шаг назад";
             this.ABStepBackButton.UseVisualStyleBackColor = true;
             this.ABStepBackButton.Click += new System.EventHandler(this.ABStepBackButton_Click);
             // 
@@ -607,9 +611,9 @@ namespace LabMethodOptimize
             // 
             this.AllABStepButton.Enabled = false;
             this.AllABStepButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
-            this.AllABStepButton.Location = new System.Drawing.Point(776, 241);
+            this.AllABStepButton.Location = new System.Drawing.Point(840, 300);
             this.AllABStepButton.Name = "AllABStepButton";
-            this.AllABStepButton.Size = new System.Drawing.Size(211, 78);
+            this.AllABStepButton.Size = new System.Drawing.Size(150, 70);
             this.AllABStepButton.TabIndex = 14;
             this.AllABStepButton.Text = "Решить до конца";
             this.AllABStepButton.UseVisualStyleBackColor = true;
@@ -618,29 +622,31 @@ namespace LabMethodOptimize
             // textBox10
             // 
             this.textBox10.BackColor = System.Drawing.Color.Ivory;
+            this.textBox10.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox10.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.textBox10.Location = new System.Drawing.Point(205, 518);
+            this.textBox10.Location = new System.Drawing.Point(40, 508);
             this.textBox10.Name = "textBox10";
             this.textBox10.ReadOnly = true;
-            this.textBox10.Size = new System.Drawing.Size(256, 24);
+            this.textBox10.Size = new System.Drawing.Size(256, 17);
             this.textBox10.TabIndex = 13;
             this.textBox10.Text = "Выбранный опорный элемент";
             // 
             // textBox11
             // 
             this.textBox11.BackColor = System.Drawing.Color.Ivory;
+            this.textBox11.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox11.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.textBox11.Location = new System.Drawing.Point(205, 474);
+            this.textBox11.Location = new System.Drawing.Point(40, 464);
             this.textBox11.Name = "textBox11";
             this.textBox11.ReadOnly = true;
-            this.textBox11.Size = new System.Drawing.Size(256, 24);
+            this.textBox11.Size = new System.Drawing.Size(256, 17);
             this.textBox11.TabIndex = 12;
             this.textBox11.Text = "Возможный опорный элемент";
             // 
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.Color.LightCoral;
-            this.panel3.Location = new System.Drawing.Point(173, 518);
+            this.panel3.Location = new System.Drawing.Point(8, 505);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(26, 24);
             this.panel3.TabIndex = 11;
@@ -648,7 +654,7 @@ namespace LabMethodOptimize
             // panel4
             // 
             this.panel4.BackColor = System.Drawing.Color.Aquamarine;
-            this.panel4.Location = new System.Drawing.Point(173, 475);
+            this.panel4.Location = new System.Drawing.Point(8, 462);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(26, 23);
             this.panel4.TabIndex = 10;
@@ -657,7 +663,7 @@ namespace LabMethodOptimize
             // 
             this.ABAnswerText.BackColor = System.Drawing.Color.OldLace;
             this.ABAnswerText.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.ABAnswerText.Location = new System.Drawing.Point(854, 356);
+            this.ABAnswerText.Location = new System.Drawing.Point(548, 469);
             this.ABAnswerText.Multiline = true;
             this.ABAnswerText.Name = "ABAnswerText";
             this.ABAnswerText.ReadOnly = true;
@@ -668,11 +674,11 @@ namespace LabMethodOptimize
             // 
             this.ABStepButton.Enabled = false;
             this.ABStepButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
-            this.ABStepButton.Location = new System.Drawing.Point(776, 157);
+            this.ABStepButton.Location = new System.Drawing.Point(840, 195);
             this.ABStepButton.Name = "ABStepButton";
-            this.ABStepButton.Size = new System.Drawing.Size(211, 78);
+            this.ABStepButton.Size = new System.Drawing.Size(150, 70);
             this.ABStepButton.TabIndex = 8;
-            this.ABStepButton.Text = "Шаг";
+            this.ABStepButton.Text = "Иск. шаг";
             this.ABStepButton.UseVisualStyleBackColor = true;
             this.ABStepButton.Click += new System.EventHandler(this.ABStepButton_Click);
             // 
@@ -686,14 +692,13 @@ namespace LabMethodOptimize
             this.ABSolverTable.Location = new System.Drawing.Point(8, 6);
             this.ABSolverTable.Name = "ABSolverTable";
             this.ABSolverTable.ReadOnly = true;
-            this.ABSolverTable.Size = new System.Drawing.Size(750, 429);
+            this.ABSolverTable.Size = new System.Drawing.Size(800, 450);
             this.ABSolverTable.TabIndex = 7;
             this.ABSolverTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.ABSolverTable_CellClick);
             // 
             // tabPage4
             // 
             this.tabPage4.BackColor = System.Drawing.Color.Ivory;
-            this.tabPage4.Controls.Add(this.RefreshButton);
             this.tabPage4.Controls.Add(this.objFunctionText);
             this.tabPage4.Controls.Add(this.textBox15);
             this.tabPage4.Controls.Add(this.textBox16);
@@ -705,7 +710,7 @@ namespace LabMethodOptimize
             this.tabPage4.Location = new System.Drawing.Point(4, 24);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(1392, 772);
+            this.tabPage4.Size = new System.Drawing.Size(1234, 618);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Графический метод";
             // 
@@ -773,10 +778,11 @@ namespace LabMethodOptimize
             // 
             this.GPanel.BackColor = System.Drawing.Color.White;
             this.GPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.GPanel.Location = new System.Drawing.Point(518, 6);
+            this.GPanel.Location = new System.Drawing.Point(373, 7);
             this.GPanel.Name = "GPanel";
             this.GPanel.Size = new System.Drawing.Size(850, 600);
             this.GPanel.TabIndex = 13;
+            this.GPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.GPanel_Paint);
             // 
             // GAnswerText
             // 
@@ -796,11 +802,12 @@ namespace LabMethodOptimize
             this.GSSolutionTable.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(229)))), ((int)(((byte)(238)))));
             this.GSSolutionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GSSolutionTable.GridColor = System.Drawing.SystemColors.ActiveBorder;
-            this.GSSolutionTable.Location = new System.Drawing.Point(8, 498);
+            this.GSSolutionTable.Location = new System.Drawing.Point(18, 472);
             this.GSSolutionTable.Name = "GSSolutionTable";
             this.GSSolutionTable.ReadOnly = true;
-            this.GSSolutionTable.Size = new System.Drawing.Size(483, 258);
+            this.GSSolutionTable.Size = new System.Drawing.Size(327, 85);
             this.GSSolutionTable.TabIndex = 10;
+            this.GSSolutionTable.Visible = false;
             // 
             // saveFileDialog
             // 
@@ -810,24 +817,12 @@ namespace LabMethodOptimize
             // 
             this.openFileDialog.Filter = "Text files (*.txt)|*.txt";
             // 
-            // RefreshButton
-            // 
-            this.RefreshButton.BackgroundImage = global::LabMethodOptimize.Properties.Resources.Refresh_icon_svg;
-            this.RefreshButton.Image = global::LabMethodOptimize.Properties.Resources.Refresh_icon_svg;
-            this.RefreshButton.Location = new System.Drawing.Point(380, 179);
-            this.RefreshButton.Name = "RefreshButton";
-            this.RefreshButton.Size = new System.Drawing.Size(111, 105);
-            this.RefreshButton.TabIndex = 19;
-            this.RefreshButton.Text = "button1";
-            this.RefreshButton.UseVisualStyleBackColor = true;
-            this.RefreshButton.Click += new System.EventHandler(this.RefreshButton_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Ivory;
-            this.ClientSize = new System.Drawing.Size(1410, 831);
+            this.ClientSize = new System.Drawing.Size(1250, 680);
             this.Controls.Add(this.MainMenu);
             this.Controls.Add(this.tabControl);
             this.MainMenuStrip = this.MainMenu;
@@ -920,7 +915,6 @@ namespace LabMethodOptimize
         private System.Windows.Forms.TextBox objFunctionText;
         private System.Windows.Forms.TextBox textBox15;
         private System.Windows.Forms.TextBox textBox16;
-        private System.Windows.Forms.Button RefreshButton;
     }
 }
 
