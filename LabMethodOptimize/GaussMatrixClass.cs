@@ -156,6 +156,25 @@ namespace GaussMatrixClass
             }
             return S;
         }
+
+        public void GetRidOfNegativeLines()
+        {
+            for (int i = 0; i < RowCount; i++)
+            {                
+                if (RightPart[i] < 0)
+                {
+                    for (int g = 0; g < ColumCount; g++)
+                    {
+                        if (IndexListBasisElements.Contains(g))
+                        {
+                            continue;
+                        }
+                        Matrix[i][g] *= -1;
+                    }
+                    RightPart[i] *= -1;
+                }
+            }
+        }
     }
 }
 

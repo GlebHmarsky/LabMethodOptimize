@@ -116,7 +116,7 @@ namespace LabMethodOptimize
             this.restrictionTable.Location = new System.Drawing.Point(195, 111);
             this.restrictionTable.Name = "restrictionTable";
             this.restrictionTable.RowHeadersWidth = 80;
-            this.restrictionTable.Size = new System.Drawing.Size(550, 344);
+            this.restrictionTable.Size = new System.Drawing.Size(603, 344);
             this.restrictionTable.TabIndex = 0;
             this.restrictionTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.restrictionTable_CellValueChanged);
             // 
@@ -368,7 +368,7 @@ namespace LabMethodOptimize
             this.textBox6.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 17F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
             this.textBox6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
-            this.textBox6.Location = new System.Drawing.Point(769, 9);
+            this.textBox6.Location = new System.Drawing.Point(826, 9);
             this.textBox6.Name = "textBox6";
             this.textBox6.ReadOnly = true;
             this.textBox6.Size = new System.Drawing.Size(202, 20);
@@ -383,7 +383,7 @@ namespace LabMethodOptimize
             this.basicVariablesTable.AllowUserToResizeRows = false;
             this.basicVariablesTable.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(229)))), ((int)(((byte)(238)))));
             this.basicVariablesTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.basicVariablesTable.Location = new System.Drawing.Point(767, 32);
+            this.basicVariablesTable.Location = new System.Drawing.Point(824, 32);
             this.basicVariablesTable.Name = "basicVariablesTable";
             this.basicVariablesTable.RowTemplate.Height = 30;
             this.basicVariablesTable.Size = new System.Drawing.Size(284, 53);
@@ -426,7 +426,7 @@ namespace LabMethodOptimize
             this.objectiveFunctionTable.Location = new System.Drawing.Point(195, 32);
             this.objectiveFunctionTable.Name = "objectiveFunctionTable";
             this.objectiveFunctionTable.RowTemplate.Height = 23;
-            this.objectiveFunctionTable.Size = new System.Drawing.Size(550, 53);
+            this.objectiveFunctionTable.Size = new System.Drawing.Size(603, 53);
             this.objectiveFunctionTable.TabIndex = 10;
             this.objectiveFunctionTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.objectiveFunctionTable_CellValueChanged);
             // 

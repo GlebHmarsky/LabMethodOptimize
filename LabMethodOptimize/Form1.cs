@@ -88,12 +88,8 @@ namespace LabMethodOptimize
         }
 
 
-
-        // План на день ;)    
-
         // ADD добвить проверку что строки функции и базиса заполнены(!) Формат можно не проверять, на это будем ругаться после.
-        // ADD сделать проверку что если введут плохой базис в графическом методе (или она не нужна?)
-        // Главное чтоб были для двух методов сделана проверка
+
         private void numericUpDownColumn_ValueChanged(object sender, EventArgs e)
         {
             if (restrictionTable.Columns.Count < 1)
@@ -340,7 +336,223 @@ namespace LabMethodOptimize
 
         /*-------------------------------      WORK WITH ALL 3 METHODS     ------------------------------*/
 
+        private void BeginSolve_Click(object sender, EventArgs e)
+        {
+            //Однако у нас же в графическом методе бывает куча ограничений, как быть с ними?
+            /*
+             * Наверное нужно полагать что если перемнных 2 или 3 то ограничений может быть побольше
+             * Но если иначе, то ...
+             * Нет не может быть побольше. Для графического только на 2-3 ограничения меньше чем переменных. Соответственно будет
+             * 2Д и 3Д объект отрисовываться. 
+             * 
+             * Вспомная ту домашку с 2 переменными и миллардом ограничений мы можем составить "изначальную" задачу. 
+             * Та, из которой мы пришли к этой. В ней будет на 2 переменных больше чем ограничений в этой и соответсвенно она будет выглядеть готовой,
+             * т.к. она будет уже приведена гауссом ( в каждой строке 1 и остальное 0, кроме 1ой и 2ой переменных) 
+             * 
+             * Так что бьём по попе пользователя если тот удумает запускать графический метод с неправильным количеством переменных
+             */
 
+            // TODO:  Не допускать решение когда не прописаны базисные переменные
+            StartRowForAnswerTable = 0;
+            MemoryOfSteps.Clear();
+            ActivateButtnosOnTab(-1);
+
+            fCanDraw = false;
+
+            RowCount = (uint)numericUpDownRow.Value;
+            ColumCount = (uint)numericUpDownColumn.Value;
+            if (RowCount == 0 || ColumCount == 0)
+            {
+                return;
+            }
+
+            if (RowCount > ColumCount)
+            {
+                //ругаемся и выходим сразу же
+                //для графического будет повторная проверка чтоб было ограничений на 2 меньше
+                MessageBox.Show("Число ограничений больше числа переменных.\r\n" +
+                    "Пожалуйста, исправьте и попытайтесь ещё раз");
+                ActivateButtnosOnTab(0);
+                return;
+            }
+            GaussMatrix GaussMat = new GaussMatrix(RowCount, ColumCount);
+            SSolver = new SimplexSolver(RowCount, ColumCount - RowCount);
+
+            indexOfOptimalPoint = -1;
+            valueOfSolution = null;
+
+
+            if (RBSimplexMethod.Checked) // Симплекс
+            {
+                SSolutionTable.Rows.Clear();
+                SSAnswerText.Text = "";
+
+                //Разрешение и блокиовка кнопок
+                ActivateButtnosOnTab(1);
+
+                tabControl.SelectTab(tabPage2);
+
+                if ((GaussMat = FillTheGaussMatFromTable(GaussMat)) == null) return;
+                if (SetIndexListBasisElementsFromTable(GaussMat) > 0) return;
+            }
+            else if (RBArtificial.Checked) // Искуственный
+            {
+
+                ABSolverTable.Rows.Clear();
+                ABAnswerText.Text = "";
+
+                ActivateButtnosOnTab(2);
+
+                tabControl.SelectTab(tabPage3);
+
+                GaussMat = new GaussMatrix(RowCount, ColumCount + RowCount);
+                SSolver = new SimplexSolver(RowCount, ColumCount);
+
+                if ((GaussMat = FillTheGaussMatFromTable(GaussMat)) == null) return;
+                //Нужно заполнить ещё список элементов справа в виде единичной матрицы
+                for (int i = 0; i < RowCount; i++)
+                {
+                    GaussMat.Matrix[i][ColumCount + i] = new Fraction(1);
+                    for (int g = 0; g < RowCount; g++)
+                    {
+                        if (g == i) continue;
+                        GaussMat.Matrix[i][ColumCount + g] = new Fraction(0);
+                    }
+                }
+                //Теперь бы заполнить базис этими новыми переменными
+                for (int i = 0; i < RowCount; i++)
+                {
+                    GaussMat.IndexListBasisElements.Add(i + (int)ColumCount);
+                }
+
+                GaussMat.GetRidOfNegativeLines();
+            }
+            else if (RBGraphic.Checked) // Графика
+            {
+                GSSolutionTable.Rows.Clear();
+                GAnswerText.Text = "";
+                lPoints.Clear();
+
+                if (ColumCount - RowCount != 2)
+                {
+                    MessageBox.Show("Плохое количество ограничений\n\nДолжно быть на 2 меньше чем количество переменных");
+                    tabControl.SelectTab(tabPage1);
+                    return;
+                }
+
+                ActivateButtnosOnTab(3);
+                tabControl.SelectTab(tabPage4);
+                if ((GaussMat = FillTheGaussMatFromTable(GaussMat)) == null) return;
+                if (SetIndexListBasisElementsFromTable(GaussMat) > 0) return;
+            }
+
+            GaussMat.IndexListBasisElements.Sort();
+
+            if (GaussMat.SolveMatrix() == 1)
+            {
+                MessageBox.Show("Получил ошибку при решении метода Гаусса.\n\n" +
+                    "Система несовместна.\n\n" +
+                    "Измените значения и попытайтесь ещё раз.");
+
+                ActivateButtnosOnTab(0);
+
+                tabControl.SelectTab(tabPage1);
+                return;
+            }
+
+
+            /*-----------------------       SimplexSolver       -----------------------*/
+
+
+            List<Fraction> objectiveFunctionArr = new List<Fraction>();
+            try
+            {
+                if (RBArtificial.Checked) // Искуственный
+                {
+                    for (int i = 0; i < ColumCount; i++)
+                    {
+                        objectiveFunctionArr.Add(new Fraction(0));
+                    }
+                    for (int g = 0; g < RowCount; g++)
+                    {
+                        objectiveFunctionArr.Add(new Fraction(1));
+                    }
+                    SSolver.FillTable(GaussMat, objectiveFunctionArr, false);
+                    SSolver.isArtificialTask = true;
+                }
+                else // Симплекс
+                {
+                    foreach (DataGridViewCell cell in objectiveFunctionTable.Rows[0].Cells)
+                    {
+                        objectiveFunctionArr.Add(new Fraction(cell.Value.ToString()));
+                    }
+
+                    SSolver.FillTable(GaussMat, objectiveFunctionArr, optimizationProblem.SelectedIndex == 1);
+                }
+
+            }
+            catch (NullReferenceException exp)
+            {
+                MessageBox.Show($"Какие ужасные аргументы задачи боже мой: {exp.Message}\n\n");
+                return;
+            }
+            catch (FractionException exp)
+            {
+                MessageBox.Show($"Format Fraction error.\n\nError message: {exp.Message}\n\n");
+                return;
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show($"Security error.\n\nError message: {exp.Message}\n\n" +
+                $"Details:\n\n{exp.StackTrace}");
+                return;
+            }
+            if (RBSimplexMethod.Checked) // Симплекс
+            {
+                PrintResultToSoulutionGridView(SSolutionTable, SSolver);
+                bool OnRightHaveNegativeEl = SSolver.RightPart.Any(x => x < 0); // Для графического не требуется.
+                if (OnRightHaveNegativeEl)
+                {
+                    ActivateButtnosOnTab(0);
+                    SSAnswerText.Text = "Плохой начальный базис.\r\nПожалуйста, больше так не делайте.";
+                    return;
+                }
+
+                string str;
+                if ((str = FindAndCheckBearingElements()).Length > 0)
+                {
+                    SSAnswerText.Text = str;
+                    ActivateButtnosOnTab(0);
+                }
+
+                pivotIndex = SSolver.FindOptimalBearingElement();
+                SSolver.pivotIndex = pivotIndex;
+                MemoryOfSteps.Add(new SimplexSolver(SSolver));
+                if (pivotIndex < 0)
+                {
+                    //Нету элементов и надо выходить                
+                    return;
+                }
+                ColorTheBearingEletemts(SSolutionTable);
+
+            }
+            else if (RBArtificial.Checked) // Искуственный
+            {
+                //SSolver.GetRidOfNegativeLines();//Избавляемся от отрицательных элементов справа
+                PrintResultToSoulutionGridView(ABSolverTable, SSolver);
+                FindAndCheckBearingElements();
+                pivotIndex = SSolver.FindOptimalBearingElement();
+
+                SSolver.pivotIndex = pivotIndex;
+                MemoryOfSteps.Add(new SimplexSolver(SSolver));
+                ColorTheBearingEletemts(ABSolverTable);
+            }
+            else if (RBGraphic.Checked)
+            {
+                //PrintResultToSoulutionGridView(GSSolutionTable, SSolver); //Вывод ограничений сделан несколько красивее чем обыная симплекс таблица
+                Make2DModel();
+            }
+        }
         private void ActivateButtnosOnTab(int whitchTab)
         {
             switch (whitchTab)
@@ -471,221 +683,6 @@ namespace LabMethodOptimize
 
             return GaussMat;
         }
-        private void BeginSolve_Click(object sender, EventArgs e)
-        {
-            //Однако у нас же в графическом методе бывает куча ограничений, как быть с ними?
-            /*
-             * Наверное нужно полагать что если перемнных 2 или 3 то ограничений может быть побольше
-             * Но если иначе, то ...
-             * Нет не может быть побольше. Для графического только на 2-3 ограничения меньше чем переменных. Соответственно будет
-             * 2Д и 3Д объект отрисовываться. 
-             * 
-             * Вспомная ту домашку с 2 переменными и миллардом ограничений мы можем составить "изначальную" задачу. 
-             * Та, из которой мы пришли к этой. В ней будет на 2 переменных больше чем ограничений в этой и соответсвенно она будет выглядеть готовой,
-             * т.к. она будет уже приведена гауссом ( в каждой строке 1 и остальное 0, кроме 1ой и 2ой переменных) 
-             * 
-             * Так что бьём по попе пользователя если тот удумает запускать графический метод с неправильным количеством переменных
-             */
-
-            // TODO:  Не допускать решение когда не прописаны базисные переменные
-            StartRowForAnswerTable = 0;
-            MemoryOfSteps.Clear();
-            ActivateButtnosOnTab(0);
-
-            fCanDraw = false;
-
-            RowCount = (uint)numericUpDownRow.Value;
-            ColumCount = (uint)numericUpDownColumn.Value;
-            if (RowCount == 0 || ColumCount == 0)
-            {
-                return;
-            }
-
-            if (RowCount > ColumCount)
-            {
-                //ругаемся и выходим сразу же
-                //для графического будет повторная проверка чтоб было ограничений на 2 меньше
-                MessageBox.Show("Число ограничений больше числа переменных.\r\n" +
-                    "Пожалуйста, исправьте и попытайтесь ещё раз");
-                ActivateButtnosOnTab(0);
-                return;
-            }
-            GaussMatrix GaussMat = new GaussMatrix(RowCount, ColumCount);
-            SSolver = new SimplexSolver(RowCount, ColumCount - RowCount);
-
-            indexOfOptimalPoint = -1;
-            valueOfSolution = null;
-
-
-            if (RBSimplexMethod.Checked) // Симплекс
-            {
-                SSolutionTable.Rows.Clear();
-                SSAnswerText.Text = "";
-
-                //Разрешение и блокиовка кнопок
-                ActivateButtnosOnTab(1);
-
-                tabControl.SelectTab(tabPage2);
-
-                if ((GaussMat = FillTheGaussMatFromTable(GaussMat)) == null) return;
-                if (SetIndexListBasisElementsFromTable(GaussMat) > 0) return;
-            }
-            else if (RBArtificial.Checked) // Искуственный
-            {
-
-                ABSolverTable.Rows.Clear();
-                ABAnswerText.Text = "";
-
-                ActivateButtnosOnTab(2);
-
-                tabControl.SelectTab(tabPage3);
-
-                GaussMat = new GaussMatrix(RowCount, ColumCount + RowCount);
-                SSolver = new SimplexSolver(RowCount, ColumCount);
-
-                if ((GaussMat = FillTheGaussMatFromTable(GaussMat)) == null) return;
-                //Нужно заполнить ещё список элементов справа в виде единичной матрицы
-                for (int i = 0; i < RowCount; i++)
-                {
-                    GaussMat.Matrix[i][ColumCount + i] = new Fraction(1);
-                    for (int g = 0; g < RowCount; g++)
-                    {
-                        if (g == i) continue;
-                        GaussMat.Matrix[i][ColumCount + g] = new Fraction(0);
-                    }
-                }
-                //Теперь бы заполнить базис этими новыми переменными
-                for (int i = 0; i < RowCount; i++)
-                {
-                    GaussMat.IndexListBasisElements.Add(i + (int)ColumCount);
-                }
-
-            }
-            else if (RBGraphic.Checked) // Графика
-            {
-                GSSolutionTable.Rows.Clear();
-                GAnswerText.Text = "";
-                lPoints.Clear();
-
-                ActivateButtnosOnTab(3);
-
-                if (RowCount > ColumCount - 2)
-                {
-                    MessageBox.Show("Плохое количество граничных условий\n\nОно больше чем количество переменных");
-                    tabControl.SelectTab(tabPage1);
-                    return;
-                }
-                tabControl.SelectTab(tabPage4);
-                if ((GaussMat = FillTheGaussMatFromTable(GaussMat)) == null) return;
-                if (SetIndexListBasisElementsFromTable(GaussMat) > 0) return;
-            }
-
-            GaussMat.IndexListBasisElements.Sort();
-            if (GaussMat.SolveMatrix() == 1)
-            {
-                MessageBox.Show("Получил ошибку при решении метода Гаусса.\n\n" +
-                    "Вы либо ввели плохой базис, либо система несовместна, либо зависима.\n\n" +
-                    "Измените значения и попытайтесь ещё раз.");
-
-                ActivateButtnosOnTab(0);
-
-                tabControl.SelectTab(tabPage1);
-                return;
-            }
-
-
-            /*-----------------------       SimplexSolver       -----------------------*/
-
-
-            List<Fraction> objectiveFunctionArr = new List<Fraction>();
-            try
-            {
-                if (RBArtificial.Checked) // Искуственный
-                {
-                    for (int i = 0; i < ColumCount; i++)
-                    {
-                        objectiveFunctionArr.Add(new Fraction(0));
-                    }
-                    for (int g = 0; g < RowCount; g++)
-                    {
-                        objectiveFunctionArr.Add(new Fraction(1));
-                    }
-                    SSolver.FillTable(GaussMat, objectiveFunctionArr, false);
-                    SSolver.isArtificialTask = true;
-                }
-                else // Симплекс
-                {
-                    foreach (DataGridViewCell cell in objectiveFunctionTable.Rows[0].Cells)
-                    {
-                        objectiveFunctionArr.Add(new Fraction(cell.Value.ToString()));
-                    }
-
-                    SSolver.FillTable(GaussMat, objectiveFunctionArr, optimizationProblem.SelectedIndex == 1);
-                }
-
-            }
-            catch (NullReferenceException exp)
-            {
-                MessageBox.Show($"Какие ужасные аргументы задачи боже мой: {exp.Message}\n\n");
-                return;
-            }
-            catch (FractionException exp)
-            {
-                MessageBox.Show($"Format Fraction error.\n\nError message: {exp.Message}\n\n");
-                return;
-            }
-            catch (Exception exp)
-            {
-                MessageBox.Show($"Security error.\n\nError message: {exp.Message}\n\n" +
-                $"Details:\n\n{exp.StackTrace}");
-                return;
-            }
-            if (RBSimplexMethod.Checked) // Симплекс
-            {
-                PrintResultToSoulutionGridView(SSolutionTable, SSolver);
-                bool OnRightHaveNegativeEl = SSolver.RightPart.Any(x => x < 0); // Для графического не требуется.
-                if (OnRightHaveNegativeEl)
-                {
-                    ActivateButtnosOnTab(0);
-                    SSAnswerText.Text = "Плохой начальный базис.\r\nПожалуйста, больше так не делайте.";
-                    return;
-                }
-
-                string str;
-                if ((str = FindAndCheckBearingElements()).Length > 0)
-                {
-                    SSAnswerText.Text = str;
-                    ActivateButtnosOnTab(0);
-                }
-
-                pivotIndex = SSolver.FindOptimalBearingElement();
-                SSolver.pivotIndex = pivotIndex;
-                MemoryOfSteps.Add(new SimplexSolver(SSolver));
-                if (pivotIndex < 0)
-                {
-                    //Нету элементов и надо выходить                
-                    return;
-                }
-                ColorTheBearingEletemts(SSolutionTable);
-
-            }
-            else if (RBArtificial.Checked) // Искуственный
-            {
-                SSolver.GetRidOfNegativeLines();//Избавляемся от отрицательных элементов справа
-                PrintResultToSoulutionGridView(ABSolverTable, SSolver);
-                FindAndCheckBearingElements();
-                pivotIndex = SSolver.FindOptimalBearingElement();
-
-                SSolver.pivotIndex = pivotIndex;
-                MemoryOfSteps.Add(new SimplexSolver(SSolver));
-                ColorTheBearingEletemts(ABSolverTable);
-            }
-            else if (RBGraphic.Checked)
-            {
-                //PrintResultToSoulutionGridView(GSSolutionTable, SSolver); //Вывод ограничений сделан несколько красивее чем обыная симплекс таблица
-                Make2DModel();
-            }
-        }
         private void ColorTheBearingEletemts(DataGridView WorkTable)
         {
             if (SSolver.bearingEls.Count == 0) return;
@@ -758,7 +755,7 @@ namespace LabMethodOptimize
                 {
                     // Всё плолохо - система несовместна либо зависимые строки
                     //TODO проверить правда ли всегда несовместная система в этому случае? Возможен ли вариант когда система зависима (проблема с рангом)
-                    StringBuilder answer = new StringBuilder("Система несовместна\r\nНет решений.");
+                    StringBuilder answer = new StringBuilder("Система не ограничена\r\nf(x*) = ∞");
                     /*SSTextAnswer.Text =*/
                     return answer.ToString();
                 }
@@ -1155,8 +1152,17 @@ namespace LabMethodOptimize
         /*-------------------------------      GRAPHIC METHOD     ------------------------------*/
 
 
-        //ADD проверять что точка не содежиться в списке и не добавить её случайно по второму разу
-
+        private bool containPointFraction(List<Fraction[]> lPoints, Fraction[] Fpoint)
+        {
+            foreach (Fraction[] point in lPoints)
+            {
+                if (point[0] == Fpoint[0] && point[1] == Fpoint[1])
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         private void WriteAllRestrictionsAndObjFunc()
         {
             StringBuilder str = new StringBuilder();
@@ -1273,7 +1279,8 @@ namespace LabMethodOptimize
                     tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
                     if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
                     {
-                        lPoints.Add(tmpPoint);
+                        if (!containPointFraction(lPoints, tmpPoint))
+                            lPoints.Add(tmpPoint);
                         Check2DPointForSolution(tmpPoint);
                     }
                 }
@@ -1295,7 +1302,8 @@ namespace LabMethodOptimize
                     tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
                     if (CheckPoint(tmpPoint))
                     { //Точка подходит в ограничение
-                        lPoints.Add(tmpPoint);
+                        if (!containPointFraction(lPoints, tmpPoint))
+                            lPoints.Add(tmpPoint);
                         Check2DPointForSolution(tmpPoint);
                     }
                 }
@@ -1315,7 +1323,8 @@ namespace LabMethodOptimize
                     tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
                     if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
                     {
-                        lPoints.Add(tmpPoint);
+                        if (!containPointFraction(lPoints, tmpPoint))
+                            lPoints.Add(tmpPoint);
                         Check2DPointForSolution(tmpPoint);
                     }
                 }
@@ -1323,7 +1332,8 @@ namespace LabMethodOptimize
             tmpPoint = new Fraction[2] { new Fraction(0), new Fraction(0) }; //Вписываем точку начала координат (пересечение осей)
             if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
             {
-                lPoints.Add(tmpPoint);
+                if (!containPointFraction(lPoints, tmpPoint))
+                    lPoints.Add(tmpPoint);
                 Check2DPointForSolution(tmpPoint);
             }
         }
@@ -1409,10 +1419,7 @@ namespace LabMethodOptimize
                 ActivateButtnosOnTab(0);
                 GAnswerText.Text = "Нет решения для данной системы ограничения";
                 return;
-            }
-
-            //BUG А что если 1 точка???
-
+            }           
 
             /* Для проверки ограниченности задачи
              * Пробежимся по каждой прямой и отложим от нашей оптимальной точки вектор этой прямой
@@ -1425,9 +1432,9 @@ namespace LabMethodOptimize
             Fraction OldValue;
             for (int i = 0; i < SSolver.RowCount; i++)
             {
-                posibleOptimalPoint[0] = lPoints[indexOfOptimalPoint][0] + SSolver.Matrix[i][0];
-                posibleOptimalPoint[1] = lPoints[indexOfOptimalPoint][1] + SSolver.Matrix[i][1];
-                if (CheckPoint(posibleOptimalPoint) && !lPoints.Contains(posibleOptimalPoint))
+                posibleOptimalPoint[0] = lPoints[indexOfOptimalPoint][0] + 1;
+                posibleOptimalPoint[1] = lPoints[indexOfOptimalPoint][1] - SSolver.Matrix[i][0] / SSolver.Matrix[i][1];
+                if (CheckPoint(posibleOptimalPoint) && !containPointFraction(lPoints, posibleOptimalPoint))
                 {
                     //точка подошла, теперь нужно узнать что она может оказаться оптимальной
                     OldValue = new Fraction(valueOfSolution);
@@ -1438,10 +1445,41 @@ namespace LabMethodOptimize
                         //поставим в честь этого свечку
                         fTaskIsLimited = false;
                         GAnswerText.Text = "Задача не ограничена, нет решения";
+                        break;
                     }
                 }
             }
-
+            //Проверим так же оси
+            posibleOptimalPoint[0] = lPoints[indexOfOptimalPoint][0] + 1;
+            posibleOptimalPoint[1] = lPoints[indexOfOptimalPoint][1];
+            if (CheckPoint(posibleOptimalPoint) && !containPointFraction(lPoints, posibleOptimalPoint))
+            {
+                //точка подошла, теперь нужно узнать что она может оказаться оптимальной
+                OldValue = new Fraction(valueOfSolution);
+                Check2DPointForSolution(posibleOptimalPoint);
+                if (OldValue > valueOfSolution)
+                {
+                    //всё плохо, наша новая точка не содержалась в списке вершин многоугольника но оказалась оптимальней
+                    //поставим в честь этого свечку
+                    fTaskIsLimited = false;
+                    GAnswerText.Text = "Задача не ограничена, нет решения";
+                }
+            }
+            posibleOptimalPoint[0] = lPoints[indexOfOptimalPoint][0] + 0;
+            posibleOptimalPoint[1] = lPoints[indexOfOptimalPoint][1] + 1;
+            if (CheckPoint(posibleOptimalPoint) && !containPointFraction(lPoints, posibleOptimalPoint))
+            {
+                //точка подошла, теперь нужно узнать что она может оказаться оптимальной
+                OldValue = new Fraction(valueOfSolution);
+                Check2DPointForSolution(posibleOptimalPoint);
+                if (OldValue > valueOfSolution)
+                {
+                    //всё плохо, наша новая точка не содержалась в списке вершин многоугольника но оказалась оптимальней
+                    //поставим в честь этого свечку
+                    fTaskIsLimited = false;
+                    GAnswerText.Text = "Задача не ограничена, нет решения";
+                }
+            }
             //выводим ответ
             StringBuilder answer;
             answer = new StringBuilder("x* (");
@@ -1517,14 +1555,9 @@ namespace LabMethodOptimize
                 }
             }
 
-            distance = Fraction.Abs(paramBForRight - paramBForLeft);
-            step = distance / 45; //знаменатель отвечает за количество линий при закраске
+            offset = ((lB - lA) / 7) + 0.5;
 
-
-            offset = (lB - lA) / 7;
-
-            //Нашли границы рисунка, но будем рисовать с отступом, чтобы картинка не была грубой
-            //TODO подумать и может всё таки изменить gA gC как в заметках 
+            //Нашли границы рисунка, но будем рисовать с отступом, чтобы картинка не была грубой            
             gA = -offset;
             gC = -offset;
             gB = lB + offset;
@@ -1547,10 +1580,9 @@ namespace LabMethodOptimize
             fCanDraw = true;
             Draw2D();
         }
-
-        /*-------------     НАЧАЛО ВСЕГО РИСОВАНИЯ     -------------*/
-        void Draw2D()
+        private void Draw2D()
         {
+            /*-------------     НАЧАЛО ВСЕГО РИСОВАНИЯ     -------------*/
             if (!fCanDraw)
                 return;
             SolidBrush bruh = new SolidBrush(Color.Red);
@@ -1580,10 +1612,14 @@ namespace LabMethodOptimize
                 gr.DrawLine(pen, lp, rp);
             }
             pen.Color = Color.Aqua;
-
+            /*---------    ЗАКРАШИВАЕМ    ---------*/
             GaussMatrix gm = new GaussMatrix(SSolver.ColumCount);
             Fraction[] tmpPoint;
             List<Fraction[]> lPrintPoints = new List<Fraction[]>();
+
+            distance = Fraction.Abs((gB * paramA) + gD);
+            step = distance / 60;
+            paramBForLeft = gD;
             for (Fraction iter = step; iter < distance; iter += step)
             {
                 for (int i = 0; i < SSolver.RowCount; i++)
@@ -1608,7 +1644,8 @@ namespace LabMethodOptimize
                     tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
                     if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
                     {
-                        lPrintPoints.Add(tmpPoint);
+                        if (!containPointFraction(lPrintPoints, tmpPoint))
+                            lPrintPoints.Add(tmpPoint);
                     }
 
                 }
@@ -1626,7 +1663,8 @@ namespace LabMethodOptimize
                     tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
                     if (CheckPoint(tmpPoint))
                     { //Точка подходит в ограничение
-                        lPrintPoints.Add(tmpPoint);
+                        if (!containPointFraction(lPrintPoints, tmpPoint))
+                            lPrintPoints.Add(tmpPoint);
                     }
                 }
                 /*-----------   С осью ординат   ------------*/
@@ -1643,15 +1681,72 @@ namespace LabMethodOptimize
                     tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
                     if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
                     {
-                        lPrintPoints.Add(tmpPoint);
+                        if (!containPointFraction(lPrintPoints, tmpPoint))
+                            lPrintPoints.Add(tmpPoint);
                     }
                 }
 
+
+                if (lPrintPoints.Count == 1)
+                {
+                    //Если одна точка, то значит что можно продлить прямую до верхнего ограничения
+
+                    /*-----------   по оси абцисс    ------------*/
+                    gm.Matrix[0][0] = 0;
+                    gm.Matrix[0][1] = 1;
+                    gm.RightPart[0] = gD;
+
+                    gm.Matrix[1][0] = -paramA;
+                    gm.Matrix[1][1] = 1;
+                    gm.RightPart[1] = paramBForLeft - iter;
+
+                    if (!(gm.SolveMatrix() > 0))//Прямые парараллельны, просто пропускаем этот шаг
+                    {
+                        tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
+                        if (CheckPoint(tmpPoint))
+                        { //Точка подходит в ограничение
+                            if (!containPointFraction(lPrintPoints, tmpPoint))
+                                lPrintPoints.Add(tmpPoint);
+                        }
+                    }
+                    /*-----------   по оси ординат   ------------*/
+                    gm.Matrix[0][0] = 1;
+                    gm.Matrix[0][1] = 0;
+                    gm.RightPart[0] = gB;
+
+                    gm.Matrix[1][0] = -paramA;
+                    gm.Matrix[1][1] = 1;
+                    gm.RightPart[1] = paramBForLeft - iter;
+
+                    if (!(gm.SolveMatrix() > 0))//Прямые парараллельны, просто пропускаем этот шаг
+                    {
+                        tmpPoint = new Fraction[2] { gm.RightPart[0], gm.RightPart[1] };
+                        if (CheckPoint(tmpPoint)) //Точка подходит в ограничение
+                        {
+                            if (!containPointFraction(lPrintPoints, tmpPoint))
+                                lPrintPoints.Add(tmpPoint);
+                        }
+                    }
+
+                    if (lPrintPoints.Count > 1)
+                    {
+                        lp.X = (int)(GPanel.Width * ((lPrintPoints[0][0] - gA) / (gB - gA)).ToDouble());
+                        lp.Y = GPanel.Height - (int)(GPanel.Height * ((lPrintPoints[0][1] - gC) / (gD - gC)).ToDouble());
+
+                        rp.X = (int)(GPanel.Width * ((lPrintPoints[1][0] - gA) / (gB - gA)).ToDouble());
+                        rp.Y = GPanel.Height - (int)(GPanel.Height * ((lPrintPoints[1][1] - gC) / (gD - gC)).ToDouble());
+
+                        gr.DrawLine(pen, lp, rp);
+                        lPrintPoints.Clear();
+                        continue;
+                    }
+                }
 
                 // Проверяем что у нас 2 точки
                 if (lPrintPoints.Count != 2)
                 {
                     //у нас не 2 точки а следовательно - это плохо
+                    lPrintPoints.Clear();
                     continue;
                 }
                 lp.X = (int)(GPanel.Width * ((lPrintPoints[0][0] - gA) / (gB - gA)).ToDouble());
@@ -1677,22 +1772,25 @@ namespace LabMethodOptimize
 
 
             /*-------------     РИСУЕМ ПРЯМУЮ СОБ. ФУНКЦИИ     -------------*/
-            pen.Color = Color.DarkGreen;
-            pen.Width = 2;
+            if (SSolver.ObjFunction[1] != 0) //Далее делить на неё будем
+            {
+                pen.Color = Color.DarkGreen;
+                pen.Width = 2;
 
-            leftPoint[0] = gA;
-            rightPoint[0] = gB;
+                leftPoint[0] = gA;
+                rightPoint[0] = gB;
 
-            leftPoint[1] = (0 - SSolver.ObjFunction[0] * leftPoint[0]) / SSolver.ObjFunction[1];
-            rightPoint[1] = (0 - SSolver.ObjFunction[0] * rightPoint[0]) / SSolver.ObjFunction[1];
+                leftPoint[1] = (0 - SSolver.ObjFunction[0] * leftPoint[0]) / SSolver.ObjFunction[1];
+                rightPoint[1] = (0 - SSolver.ObjFunction[0] * rightPoint[0]) / SSolver.ObjFunction[1];
 
-            lp.X = 0;
-            lp.Y = GPanel.Height - (int)(GPanel.Height * ((leftPoint[1] - gC) / (gD - gC)).ToDouble());
+                lp.X = 0;
+                lp.Y = GPanel.Height - (int)(GPanel.Height * ((leftPoint[1] - gC) / (gD - gC)).ToDouble());
 
-            rp.X = GPanel.Width;
-            rp.Y = GPanel.Height - (int)(GPanel.Height * ((rightPoint[1] - gC) / (gD - gC)).ToDouble());
+                rp.X = GPanel.Width;
+                rp.Y = GPanel.Height - (int)(GPanel.Height * ((rightPoint[1] - gC) / (gD - gC)).ToDouble());
 
-            gr.DrawLine(pen, lp, rp);
+                gr.DrawLine(pen, lp, rp);
+            }
 
             /*-------------     РИСУЕМ НОРМАЛЬ ПРЯМОЙ СОБ. ФУНКЦИИ     -------------*/
             pen.Color = Color.DarkRed;
@@ -1712,64 +1810,67 @@ namespace LabMethodOptimize
             //double tanges = (rightPoint[0] - leftPoint[0]).ToDouble() / (rightPoint[1] - leftPoint[1]).ToDouble();
             //rightPoint[0] /= verctorLength;
             //rightPoint[1] /= verctorLength;
+            if (verctorLength != 0)
+            {
+                lp.X = (int)(GPanel.Width * ((leftPoint[0] - gA) / (gB - gA)).ToDouble());
+                lp.Y = GPanel.Height - (int)(GPanel.Height * ((leftPoint[1] - gC) / (gD - gC))).ToDouble();
 
-            lp.X = (int)(GPanel.Width * ((leftPoint[0] - gA) / (gB - gA)).ToDouble());
-            lp.Y = GPanel.Height - (int)(GPanel.Height * ((leftPoint[1] - gC) / (gD - gC))).ToDouble();
-
-            rp.X = (int)(GPanel.Width * ((rightPoint[0].ToDouble() / verctorLength - gA.ToDouble()) / (gB.ToDouble() - gA.ToDouble())));
-            rp.Y = GPanel.Height - (int)(GPanel.Height * ((rightPoint[1].ToDouble() / verctorLength - gC.ToDouble()) / (gD - gC).ToDouble()));
-
-
-            gr.DrawLine(pen, lp, rp);
-
-            //нарисуем стрелочки
-            double angel = 20 * Math.PI / 180;
-            /* 
-             * lp.X = (int)(GPanel.Width * ((leftPoint[0] - gA.ToDouble()) / (gB.ToDouble() - gA.ToDouble())));
-             * lp.Y = GPanel.Height - (int)(GPanel.Height * ((leftPoint[1] - gC.ToDouble()) / (gD.ToDouble() - gC.ToDouble())));
-             * 
-             * leftPoint[0] = (Ex / 3);
-             * leftPoint[1] = (Ey / 3);
-             * 
-             * => смещение (ЛИШНЕЕ!!!) они уже в 0
-             * ((Ex / 3) - Ex)
-             * ((Ey / 3) - Ey)
-             * 
-             * => *как поворачивать
-             * 
-             * x` = x * cos(угол) - y * sin(угол)
-             * y` = x * sin(угол) + y * cos(угол)
-             * 
-             * =>
-             * 
-             * leftPoint[0] = leftPoint[0].ToDouble() * Math.Cos(angel) - leftPoint[1].ToDouble() * Math.Sin(angel);
-             * leftPoint[1] = leftPoint[0].ToDouble() * Math.Sin(angel) + leftPoint[1].ToDouble() * Math.Cos(angel);
-             * 
-             * =>
-             * 
-             * (Ex / 3) ) * Math.Cos(angel) - (((Ey / 3) )) * Math.Sin(angel);
-             * (Ex / 3) ) * Math.Sin(angel) + (((Ey / 3) )) * Math.Cos(angel);
-             * 
-             * => сместить обратно (а не нужно т.к. мы были в нуле уже)
-             * 
-             * (Ex / 3) * Math.Cos(Math.PI + angel) - (Ey / 3) * Math.Sin(Math.PI + angel)) + Ex
-             * (Ex / 3) * Math.Sin(Math.PI + angel) + (Ey / 3) * Math.Cos(Math.PI + angel)) + Ey
-             * 
-             * всё тоже самое с -angel для другой прямой...
-             */
-
-            double Ex = rightPoint[0].ToDouble() / verctorLength;
-            double Ey = rightPoint[1].ToDouble() / verctorLength;
-            lp.X = (int)(GPanel.Width * ((Ex / 3 * Math.Cos(Math.PI + angel)) - Ey / 3 * Math.Sin(Math.PI + angel) + Ex - gA.ToDouble()) / (gB.ToDouble() - gA.ToDouble()));
-            lp.Y = GPanel.Height - (int)(GPanel.Height * ((Ex / 3 * Math.Sin(Math.PI + angel)) + (Ey / 3 * Math.Cos(Math.PI + angel)) + Ey - gC.ToDouble()) / (gD.ToDouble() - gC.ToDouble()));
-
-            gr.DrawLine(pen, lp, rp);
-            angel = -angel;
-            lp.X = (int)(GPanel.Width * ((Ex / 3 * Math.Cos(Math.PI + angel)) - Ey / 3 * Math.Sin(Math.PI + angel) + Ex - gA.ToDouble()) / (gB.ToDouble() - gA.ToDouble()));
-            lp.Y = GPanel.Height - (int)(GPanel.Height * ((Ex / 3 * Math.Sin(Math.PI + angel)) + (Ey / 3 * Math.Cos(Math.PI + angel)) + Ey - gC.ToDouble()) / (gD.ToDouble() - gC.ToDouble()));
+                rp.X = (int)(GPanel.Width * ((rightPoint[0].ToDouble() / verctorLength - gA.ToDouble()) / (gB.ToDouble() - gA.ToDouble())));
+                rp.Y = GPanel.Height - (int)(GPanel.Height * ((rightPoint[1].ToDouble() / verctorLength - gC.ToDouble()) / (gD - gC).ToDouble()));
 
 
-            gr.DrawLine(pen, lp, rp);
+                gr.DrawLine(pen, lp, rp);
+
+
+                //нарисуем стрелочки
+                double angel = 20 * Math.PI / 180;
+                /* 
+                 * lp.X = (int)(GPanel.Width * ((leftPoint[0] - gA.ToDouble()) / (gB.ToDouble() - gA.ToDouble())));
+                 * lp.Y = GPanel.Height - (int)(GPanel.Height * ((leftPoint[1] - gC.ToDouble()) / (gD.ToDouble() - gC.ToDouble())));
+                 * 
+                 * leftPoint[0] = (Ex / 3);
+                 * leftPoint[1] = (Ey / 3);
+                 * 
+                 * => смещение (ЛИШНЕЕ!!!) они уже в 0
+                 * ((Ex / 3) - Ex)
+                 * ((Ey / 3) - Ey)
+                 * 
+                 * => *как поворачивать
+                 * 
+                 * x` = x * cos(угол) - y * sin(угол)
+                 * y` = x * sin(угол) + y * cos(угол)
+                 * 
+                 * =>
+                 * 
+                 * leftPoint[0] = leftPoint[0].ToDouble() * Math.Cos(angel) - leftPoint[1].ToDouble() * Math.Sin(angel);
+                 * leftPoint[1] = leftPoint[0].ToDouble() * Math.Sin(angel) + leftPoint[1].ToDouble() * Math.Cos(angel);
+                 * 
+                 * =>
+                 * 
+                 * (Ex / 3) ) * Math.Cos(angel) - (((Ey / 3) )) * Math.Sin(angel);
+                 * (Ex / 3) ) * Math.Sin(angel) + (((Ey / 3) )) * Math.Cos(angel);
+                 * 
+                 * => сместить обратно (а не нужно т.к. мы были в нуле уже)
+                 * 
+                 * (Ex / 3) * Math.Cos(Math.PI + angel) - (Ey / 3) * Math.Sin(Math.PI + angel)) + Ex
+                 * (Ex / 3) * Math.Sin(Math.PI + angel) + (Ey / 3) * Math.Cos(Math.PI + angel)) + Ey
+                 * 
+                 * всё тоже самое с -angel для другой прямой...
+                 */
+
+                double Ex = rightPoint[0].ToDouble() / verctorLength;
+                double Ey = rightPoint[1].ToDouble() / verctorLength;
+                lp.X = (int)(GPanel.Width * ((Ex / 3 * Math.Cos(Math.PI + angel)) - Ey / 3 * Math.Sin(Math.PI + angel) + Ex - gA.ToDouble()) / (gB.ToDouble() - gA.ToDouble()));
+                lp.Y = GPanel.Height - (int)(GPanel.Height * ((Ex / 3 * Math.Sin(Math.PI + angel)) + (Ey / 3 * Math.Cos(Math.PI + angel)) + Ey - gC.ToDouble()) / (gD.ToDouble() - gC.ToDouble()));
+
+                gr.DrawLine(pen, lp, rp);
+                angel = -angel;
+                lp.X = (int)(GPanel.Width * ((Ex / 3 * Math.Cos(Math.PI + angel)) - Ey / 3 * Math.Sin(Math.PI + angel) + Ex - gA.ToDouble()) / (gB.ToDouble() - gA.ToDouble()));
+                lp.Y = GPanel.Height - (int)(GPanel.Height * ((Ex / 3 * Math.Sin(Math.PI + angel)) + (Ey / 3 * Math.Cos(Math.PI + angel)) + Ey - gC.ToDouble()) / (gD.ToDouble() - gC.ToDouble()));
+
+
+                gr.DrawLine(pen, lp, rp);
+            }
         }
         private void Make3DModel()
         {
@@ -1782,6 +1883,12 @@ namespace LabMethodOptimize
 
         private void PrintResultToSoulutionGridView(DataGridView SSolutionTable, SimplexSolver SSolver)
         {
+            int countOfAddingRows = ((int)SSolver.RowCount + 2) + StartRowForAnswerTable - SSolutionTable.Rows.Count;
+            if (countOfAddingRows > 0)
+            {
+                SSolutionTable.Rows.Add(countOfAddingRows);
+            }
+
             //TODO Сделать проверку что если новая таблица вылетает за границы то перетаскивать скролл ниже 
             int countRowsInView = SSolutionTable.Height / SSolutionTable.RowTemplate.Height; //Количество строк помещающихся во View
             if (StartRowForAnswerTable + SSolver.RowCount + 2 > countRowsInView) //Если таблица вылезает за границы отображения
@@ -1789,13 +1896,6 @@ namespace LabMethodOptimize
                 SSolutionTable.FirstDisplayedScrollingRowIndex = StartRowForAnswerTable - ((countRowsInView - (int)SSolver.RowCount + 2) / 2);
                 Update();
             }
-
-            int countOfAddingRows = ((int)SSolver.RowCount + 2) + StartRowForAnswerTable - SSolutionTable.Rows.Count;
-            if (countOfAddingRows > 0)
-            {
-                SSolutionTable.Rows.Add(countOfAddingRows);
-            }
-
 
             int i, g;
             SSolutionTable[0, StartRowForAnswerTable].Value = "X (" + SSolver.iteration.ToString() + ")";
