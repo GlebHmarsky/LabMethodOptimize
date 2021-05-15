@@ -32,8 +32,8 @@ namespace LabMethodOptimize
         List<SimplexSolver> MemoryOfSteps = new List<SimplexSolver>();
         List<Fraction[]> lPoints = new List<Fraction[]>();
         Fraction lA, lB, lC, lD; // предельные точки графика, дальше них рисовать нету смысла. (но мы всё равно будем :) )
-        Fraction gA, gB, gC, gD; // истинные пределы рисунка дальше которых рисунка ну точна даже мы рисовать не будем
-        Fraction sA, sB, sC, sD; // Переменные для масштабирования рисунка а так же 
+        Fraction gA, gB, gC, gD; // истинные пределы рисунка
+        Fraction sA, sB, sC, sD; // Переменные для масштабирования рисунка
         int indexOfOptimalPoint = -1;
         Fraction valueOfSolution = null;
 
@@ -89,9 +89,6 @@ namespace LabMethodOptimize
 
 
         }
-
-
-        // ADD добвить проверку что строки функции и базиса заполнены(!) Формат можно не проверять, на это будем ругаться после.
 
         private void numericUpDownColumn_ValueChanged(object sender, EventArgs e)
         {
@@ -704,11 +701,19 @@ namespace LabMethodOptimize
                 for (int i = 0; i < restrictionTable.RowCount; i++)
                 {
                     int g;
+                    double tmpDouble;
                     for (g = 0; g < restrictionTable.ColumnCount - 1; g++)
                     {
-                        GaussMat.Matrix[i][g] = new Fraction(restrictionTable[g, i].Value.ToString());
+                        if (Double.TryParse(restrictionTable[g, i].Value.ToString(), out tmpDouble))
+                            GaussMat.Matrix[i][g] = new Fraction(tmpDouble.ToString("0.00000")); //Ограничиваем double чтобы не было Overflow у Fraction
+                        else
+                            GaussMat.Matrix[i][g] = new Fraction(restrictionTable[g, i].Value.ToString());
                     }
-                    GaussMat.RightPart[i] = new Fraction(restrictionTable[g, i].Value.ToString());
+                    if (Double.TryParse(restrictionTable[g, i].Value.ToString(), out tmpDouble))
+                        GaussMat.RightPart[i] = new Fraction(tmpDouble.ToString("0.00000")); //Ограничиваем double чтобы не было Overflow у Fraction
+                    else
+                        GaussMat.RightPart[i] = new Fraction(restrictionTable[g, i].Value.ToString());
+
                 }
             }
             catch (DataReadException exp)
@@ -1224,6 +1229,11 @@ namespace LabMethodOptimize
 
             for (int g = 0; g < SSolver.ColumCount; g++)
             {
+                if (ColumCount - RowCount == 1 && RBGraphic.Checked &&
+                   g + 1 == SSolver.ColumCount)//Не выводим последний элемент списка если это 1D графическая задача
+                {
+                    continue;
+                }
                 if (SSolver.ObjFunction[g] < 0 && str.Length > 0)
                     str.Length--;//стираем + в конце строки
 
@@ -1232,6 +1242,10 @@ namespace LabMethodOptimize
                                  (SSolver.ObjFunction[g]).ToDouble().ToString("0.000"));
                 str.Append($" *X{SSolver.ILFreeEl[g] + 1} +");
             }
+
+            if (SSolver.OFV > 0 && str.Length > 0)
+                str.Length--;//стираем + в конце строки
+
             str.Append(" " + (fractionType.SelectedIndex == 0 ?
                                 $"{-SSolver.OFV}" :
                                 (-SSolver.OFV).ToDouble().ToString("0.000")));
@@ -1244,6 +1258,11 @@ namespace LabMethodOptimize
             {
                 for (int g = 0; g < SSolver.ColumCount; g++)
                 {
+                    if (ColumCount - RowCount == 1 && RBGraphic.Checked &&
+                        g + 1 == SSolver.ColumCount)//Не выводим последний элемент списка если это 1D графическая задача
+                    {
+                        continue;
+                    }
                     if (SSolver.Matrix[i][g] > 0 && str.Length > 0)
                         str.Length--;//стираем + в конце строки
 
@@ -1476,11 +1495,10 @@ namespace LabMethodOptimize
                 return;
             }
 
-            /* Для проверки ограниченности задачи
-             * Пробежимся по каждой прямой и отложим от нашей оптимальной точки вектор этой прямой
+            /* Для проверки ОГРАНИЧЕННОСТИ ЗАДАЧИ
+             * пробежимся по каждой прямой и отложим от нашей оптимальной точки вектор этой прямой
              * 1-2 прямые должны дать 1-2 точки которые могут оказаться оптимальней и если они не принадлежат  нашему списку решений, то тогда 
-             * ругаться что наша функция не ограничена и следовательной всё плохо             * 
-             *
+             * ругаться что наша функция не ограничена и следовательной всё плохо
              */
             fTaskIsLimited = true;
             Fraction[] posibleOptimalPoint = new Fraction[2];
@@ -1548,6 +1566,11 @@ namespace LabMethodOptimize
 
             for (int i = 0; i < SSolver.RowCount + SSolver.ColumCount; i++)
             {
+                if (ColumCount - RowCount == 1 && RBGraphic.Checked &&
+                    i + 1 == SSolver.RowCount + SSolver.ColumCount)
+                {
+                    continue;
+                }
                 Fraction res = new Fraction(0);
                 int indexOfIEl = -1;
                 if (SSolver.ILBasisEl.Contains(i))
@@ -1558,15 +1581,13 @@ namespace LabMethodOptimize
                     {
                         res -= SSolver.Matrix[indexOfIEl][g] * lPoints[indexOfOptimalPoint][g];
                     }
-                    res = fractionType.SelectedIndex == 0 ? res : res.ToDouble();
-                    answer.Append($"{res}");
+                    answer.Append($"{(fractionType.SelectedIndex == 0 ? res : res.ToDouble())}");
                 }
                 else
                 {
                     indexOfIEl = SSolver.ILFreeEl.IndexOf(i);
                     res = lPoints[indexOfOptimalPoint][indexOfIEl];
-                    res = fractionType.SelectedIndex == 0 ? res : res.ToDouble();
-                    answer.Append($"{res}");
+                    answer.Append($"{(fractionType.SelectedIndex == 0 ? res : res.ToDouble())}");
                 }
                 answer.Append(", ");
             }

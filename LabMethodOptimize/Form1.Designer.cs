@@ -78,6 +78,7 @@ namespace LabMethodOptimize
             this.ABStepButton = new System.Windows.Forms.Button();
             this.ABSolverTable = new System.Windows.Forms.DataGridView();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.textBox17 = new System.Windows.Forms.TextBox();
             this.objFunctionText = new System.Windows.Forms.TextBox();
             this.textBox15 = new System.Windows.Forms.TextBox();
             this.textBox16 = new System.Windows.Forms.TextBox();
@@ -420,6 +421,7 @@ namespace LabMethodOptimize
             // 
             this.objectiveFunctionTable.AllowUserToAddRows = false;
             this.objectiveFunctionTable.AllowUserToDeleteRows = false;
+            this.objectiveFunctionTable.AllowUserToResizeColumns = false;
             this.objectiveFunctionTable.AllowUserToResizeRows = false;
             this.objectiveFunctionTable.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(229)))), ((int)(((byte)(238)))));
             this.objectiveFunctionTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -699,6 +701,7 @@ namespace LabMethodOptimize
             // tabPage4
             // 
             this.tabPage4.BackColor = System.Drawing.Color.Ivory;
+            this.tabPage4.Controls.Add(this.textBox17);
             this.tabPage4.Controls.Add(this.objFunctionText);
             this.tabPage4.Controls.Add(this.textBox15);
             this.tabPage4.Controls.Add(this.textBox16);
@@ -713,6 +716,19 @@ namespace LabMethodOptimize
             this.tabPage4.Size = new System.Drawing.Size(1234, 618);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Графический метод";
+            // 
+            // textBox17
+            // 
+            this.textBox17.BackColor = System.Drawing.Color.Ivory;
+            this.textBox17.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBox17.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.textBox17.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.textBox17.Location = new System.Drawing.Point(373, 10);
+            this.textBox17.Name = "textBox17";
+            this.textBox17.ReadOnly = true;
+            this.textBox17.Size = new System.Drawing.Size(494, 17);
+            this.textBox17.TabIndex = 19;
+            this.textBox17.Text = "Вы можете масштабировать рисунок колёсиком мыши";
             // 
             // objFunctionText
             // 
@@ -778,9 +794,9 @@ namespace LabMethodOptimize
             // 
             this.GPanel.BackColor = System.Drawing.Color.White;
             this.GPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.GPanel.Location = new System.Drawing.Point(373, 7);
+            this.GPanel.Location = new System.Drawing.Point(373, 33);
             this.GPanel.Name = "GPanel";
-            this.GPanel.Size = new System.Drawing.Size(850, 600);
+            this.GPanel.Size = new System.Drawing.Size(850, 574);
             this.GPanel.TabIndex = 13;
             this.GPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.GPanel_Paint);
             // 
@@ -915,6 +931,7 @@ namespace LabMethodOptimize
         private System.Windows.Forms.TextBox objFunctionText;
         private System.Windows.Forms.TextBox textBox15;
         private System.Windows.Forms.TextBox textBox16;
+        private System.Windows.Forms.TextBox textBox17;
     }
 }
 
