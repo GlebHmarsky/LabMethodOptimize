@@ -47,7 +47,7 @@ namespace LabMethodOptimize
 
 
         /*-------------------------------      INICIALIZE    ------------------------------*/
-
+        //ADD проверить все сообщения выводов об ошибках
 
         public Form1()
         {
@@ -211,9 +211,14 @@ namespace LabMethodOptimize
                 try
                 {
                     var path = openFileDialog.FileName;
+                    string tmpStr;
                     using (StreamReader sr = new StreamReader(path))
-                    {
-                        string[] str = sr.ReadLine().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    {                        
+                        if ((tmpStr = sr.ReadLine()) == null)
+                        {
+                            throw new DataReadException("Недостаточно строк в файле");
+                        }
+                        string[] str = tmpStr.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         if (str.Length != 1)
                         {
                             throw new DataReadException("Ошибка в указании задачи оптимизации");
@@ -224,7 +229,11 @@ namespace LabMethodOptimize
                         else
                             optimizationProblem.SelectedIndex = 1;
 
-                        str = sr.ReadLine().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if ((tmpStr = sr.ReadLine()) == null)
+                        {
+                            throw new DataReadException("Недостаточно строк в файле");
+                        }
+                        str = tmpStr.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         if (str.Length != 2)
                         {
                             throw new DataReadException("Ошибка в указании количества ограничений/переменных");
@@ -246,7 +255,11 @@ namespace LabMethodOptimize
                         numericUpDownColumn.Value = ColumCount;
                         numericUpDownRow.Value = RowCount;
 
-                        str = sr.ReadLine().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if ((tmpStr = sr.ReadLine()) == null)
+                        {
+                            throw new DataReadException("Недостаточно строк в файле");
+                        }
+                        str = tmpStr.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         if (str.Length != ColumCount) //REM ВОзможно тут надо будет добавить +1 т.к. не ясно может ли у целевой функции быть константа
                         {
                             throw new DataReadException("Ошибка в указании количества переменных целевой функции\n" +
@@ -254,13 +267,17 @@ namespace LabMethodOptimize
                         }
                         for (int g = 0; g < ColumCount; g++)
                         {
-                            objectiveFunctionTable[g, 0].Value = Convert.ToInt32(str[g]);
+                            objectiveFunctionTable[g, 0].Value = new Fraction(str[g]);
                         }
 
                         int i;
                         for (i = 0; i < RowCount; i++)
                         {
-                            str = sr.ReadLine().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            if ((tmpStr = sr.ReadLine()) == null)
+                            {
+                                throw new DataReadException("Недостаточно строк в файле");
+                            }
+                            str = tmpStr.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                             if (str.Length != ColumCount + 1) //+1 от того что записывается и число справа
                             {
                                 throw new DataReadException($"Ошибка в указании количества коэффициентов в {i + 1} строке ограничений\n" +
@@ -270,26 +287,25 @@ namespace LabMethodOptimize
                             int g;
                             for (g = 0; g < ColumCount; g++)
                             {
-                                restrictionTable[g, i].Value = Convert.ToInt32(str[g]);
+                                restrictionTable[g, i].Value = new Fraction(str[g]);
                             }
-                            restrictionTable[g, i].Value = Convert.ToInt32(str[g]);
+                            restrictionTable[g, i].Value = new Fraction(str[g]);
                         }
                     }
                 }
                 catch (DataReadException exp)
                 {
-                    MessageBox.Show($"Data Read error.\n\nError message: Плохой формат ввода данных\n{exp.Message}\n\n" +
-                    "\nС параметрами ввода вы можете ознакомится вj вкладке \"About\"");
+                    MessageBox.Show($"Ошибка чтения данных.\n\nСообщение: Плохой формат ввода данных\n{exp.Message}\n\n" +
+                    "\nС параметрами ввода вы можете ознакомится во вкладке \"О программе\"");
                 }
                 catch (FormatException exp)
                 {
-                    MessageBox.Show($"Format error.\n\nError message: {exp.Message}\n\n" +
-                    $"Details:\n\n{exp.StackTrace}");
+                    MessageBox.Show($"Ошибка формата данных.\n\nСообщение: {exp.Message}\n\n" +"Проверьте правильность данных и попробуйте ещё раз."/*+$"Details:\n\n{exp.StackTrace}"*/);
                 }
                 catch (Exception exp)
                 {
-                    MessageBox.Show($"Security error.\n\nError message: {exp.Message}\n\n" +
-                    $"Details:\n\n{exp.StackTrace}");
+                    MessageBox.Show($"Ошибка безопасности.\n\nnСообщение: {exp.Message}\n\n" +
+                    $"Детали:\n\n{exp.StackTrace}");
                 }
             }
         }
@@ -537,13 +553,13 @@ namespace LabMethodOptimize
             }
             catch (FractionException exp)
             {
-                MessageBox.Show($"Format Fraction error.\n\nError message: {exp.Message}\n\n");
+                MessageBox.Show($"Ошибка формата дробных чисел.\n\nСообщение: {exp.Message}\n\n");
                 return;
             }
             catch (Exception exp)
             {
-                MessageBox.Show($"Security error.\n\nError message: {exp.Message}\n\n" +
-                $"Details:\n\n{exp.StackTrace}");
+                MessageBox.Show($"Ошибка безопасности.\n\nnСообщение: {exp.Message}\n\n" +
+                $"Детали:\n\n{exp.StackTrace}");
                 return;
             }
             if (RBSimplexMethod.Checked) // Симплекс
@@ -669,26 +685,26 @@ namespace LabMethodOptimize
             }
             catch (DataReadException exp)
             {
-                MessageBox.Show($"Data Read error.\n\nПлохой формат ввода данных\n{exp.Message}\n\n");
+                MessageBox.Show($"Ошибка чтения данных.\n\nПлохой формат ввода данных\n{exp.Message}\n\n");
                 tabControl.SelectTab(tabPage1);
                 return 1;
             }
             catch (FractionException exp)
             {
-                MessageBox.Show($"Format Fraction error.\n\nError message: {exp.Message}\n\n");
+                MessageBox.Show($"Ошибка формата дробных чисел.\n\nnСообщение: {exp.Message}\n\n");
                 tabControl.SelectTab(tabPage1);
                 return 1;
             }
             catch (FormatException exp)
             {
-                MessageBox.Show($"Format error.\n\nError message: {exp.Message}");
+                MessageBox.Show($"Ошибка формата данных.\n\nnСообщение: {exp.Message}");
                 tabControl.SelectTab(tabPage1);
                 return 1;
             }
             catch (Exception exp)
             {
-                MessageBox.Show($"Security error.\n\nError message: {exp.Message}\n\n" +
-                $"Details:\n\n{exp.StackTrace}");
+                MessageBox.Show($"Ошибка безопасности.\n\nnСообщение: {exp.Message}\n\n" +
+                $"Детали:\n\n{exp.StackTrace}");
                 tabControl.SelectTab(tabPage1);
                 return 1;
             }
@@ -2060,7 +2076,7 @@ namespace LabMethodOptimize
         }
 
 
-        /* -----------------------------------    SUB WORK (кнопочки там всякие)    --------------------------------------**/
+        /* -----------------------------------    SUB WORK    --------------------------------------*/
 
 
         private void basicVariablesTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
