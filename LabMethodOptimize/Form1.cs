@@ -1482,6 +1482,11 @@ namespace LabMethodOptimize
             gr.DrawLine(pen, lp, rp);
 
             //RX1 + ((RX2 - RX1) * ((x - A) / (B - A)));
+            String str;
+            str = "X" + (SSolver.ILFreeEl[0]+1);
+            gr.DrawString(str, new Font("Arial", 12), bruh, GPanel.Width - 30, GPanel.Height - 35);
+            str = "X" + (SSolver.ILFreeEl[1]+1);
+            gr.DrawString(str, new Font("Arial", 12), bruh, 17, 17);
         }
         private void Make2DModel()
         {
